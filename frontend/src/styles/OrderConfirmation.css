@@ -1,0 +1,268 @@
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.confirmation-header {
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+  color: white;
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 16px;
+  animation: scaleIn 0.4s ease 0.1s both;
+}
+
+.confirmation-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.confirmation-details {
+  padding: 32px;
+}
+
+.detail-item {
+  margin-bottom: 24px;
+}
+
+.detail-item label {
+  display: block;
+  font-weight: 600;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.order-id {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  word-break: break-all;
+}
+
+.btn-copy {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.btn-copy:hover {
+  background: #1b5e20;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid #ec4899;
+}
+
+.item-name {
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.item-qty {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 12px;
+}
+
+.item-price {
+  font-weight: 700;
+  color: #ec4899;
+}
+
+.total-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2e7d32;
+  margin: 0;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  text-align: right;
+}
+
+.confirmation-message {
+  padding: 16px;
+  background: #e3f2fd;
+  border-left: 4px solid #1976d2;
+  border-radius: 8px;
+}
+
+.confirmation-message p {
+  margin: 0;
+  color: #1565c0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.btn-close {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+  color: white;
+  border: none;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-close:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(46, 125, 50, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+  }
+
+  .confirmation-details {
+    padding: 24px;
+  }
+
+  .confirmation-header {
+    padding: 32px 24px;
+  }
+
+  .item-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .item-qty,
+  .item-price {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmation-header {
+    padding: 24px 16px;
+  }
+
+  .confirmation-details {
+    padding: 16px;
+  }
+
+  .success-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+
+  .confirmation-header h2 {
+    font-size: 20px;
+  }
+
+  .detail-item {
+    margin-bottom: 16px;
+  }
+
+  .order-id {
+    font-size: 16px;
+  }
+
+  .total-price {
+    font-size: 20px;
+  }
+
+  .btn-close {
+    padding: 12px;
+    font-size: 14px;
+  }
+}

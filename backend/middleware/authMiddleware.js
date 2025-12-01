@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-
 const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -12,9 +11,8 @@ const authMiddleware = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         req.user = decoded;
-    next();
+        next();
     } catch(error) {
         console.log("JWT verification error:", error);
         return res.status(401).json({ message: "Invalid or expired token" });

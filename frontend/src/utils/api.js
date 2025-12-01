@@ -1,47 +1,43 @@
-import axios from 'axios';
 
-// 1️⃣ Create an axios instance
+import axios from "axios";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, 
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: API,
 });
-
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// 3️⃣ Response interceptor (optional, for handling errors globally)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+    console.error("API Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
 
-// 4️⃣ Export functions to use in components
+export const signup = (data) => api.post("/auth/signup", data);
+export const login = (data) => api.post("/auth/login", data);
 
-// Signup
-export const signup = (data) => api.post('/auth/signup', data);
+export const getProfile = () => api.get("/auth/me");
 
-// Login
-export const login = (data) => api.post('/auth/login', data);
+export const createProduct = (formData) =>
+  api.post("/products", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
-
-// Example: Fetch user profile
-export const getProfile = () => api.get('/user/me');
-
+export const getProducts = () => api.get("/products");
 
 export default api;

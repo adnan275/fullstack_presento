@@ -1,0 +1,17 @@
+
+
+.navbar-logo {
+  height: 45px;
+  width: auto;
+  margin-right: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand:hover .navbar-logo {
+  transform: scale(1.05);
+}

@@ -6,26 +6,24 @@ import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleware/authMiddleware.js';
 dotenv.config();
 
-const router = express.Router(); // create a router instance
+const router = express.Router();
 
-
-// Login route
-router.post("/login", async (req,res)=>{
+router.post("/login", async (req, res) => {
     console.log("Login route accessed");
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     try {
         const user = await prisma.user.findUnique({
-            where: {email: email}
+            where: { email: email }
         })
         if (!user) {
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({ message: "User not found" });
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({message: "Invalid credentials"});
+            return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         return res.json({
             message: "Login successful",
@@ -36,23 +34,21 @@ router.post("/login", async (req,res)=>{
                 name: user.name
             }
         })
-    } catch(error) {
+    } catch (error) {
         console.log("Error during login:", error);
-        return res.status(500).json({message: "Server error"});
+        return res.status(500).json({ message: "Server error" });
     }
 })
 
-
-// Signup route
-router.post("/signup", async (req,res)=> {
+router.post("/signup", async (req, res) => {
     console.log("Signup route accessed");
-    const {name, email, password} = req.body;
+    const { name, email, password } = req.body;
     try {
         const existingUser = await prisma.user.findUnique({
-            where: {email: email}
+            where: { email: email }
         })
         if (existingUser) {
-            return res.status(400).json({message: "User already exists"});
+            return res.status(400).json({ message: "User already exists" });
         }
         const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -64,7 +60,7 @@ router.post("/signup", async (req,res)=> {
             }
         })
 
-        const token = jwt.sign({userId: newUser.id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         return res.json({
             message: "Signup successful",
@@ -75,7 +71,7 @@ router.post("/signup", async (req,res)=> {
                 name: newUser.name
             }
         })
-    } catch(error) {
+    } catch (error) {
         console.log("Error during signup:", error);
         return res.status(500).json({
             message: "Server error",
@@ -85,10 +81,10 @@ router.post("/signup", async (req,res)=> {
     }
 })
 
-router.get("/me", authMiddleware, async (req,res)=>{
+router.get("/me", authMiddleware, async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
-            where: {id: req.user.userId},
+            where: { id: req.user.userId },
             select: {
                 id: true,
                 email: true,
@@ -96,12 +92,12 @@ router.get("/me", authMiddleware, async (req,res)=>{
             }
         })
         if (!user) {
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({ message: "User not found" });
         }
-        return res.json({user});
-    } catch(error) {
+        return res.json({ user });
+    } catch (error) {
         console.log("Error fetching user data:", error);
-        return res.status(500).json({message: "Server error"});
+        return res.status(500).json({ message: "Server error" });
     }
 })
 

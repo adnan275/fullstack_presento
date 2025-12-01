@@ -17,13 +17,23 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await login(formData); 
+      const res = await login(formData);
       console.log('Login response:', res.data);
 
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
 
-      navigate('/chat', { state: { userName: res.data.user.name } });
+      const ADMIN_EMAIL = 'ii@gmail.com';
+      const ADMIN_PASSWORD = '12345';
+      const isAdmin = formData.email === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD;
+      localStorage.setItem('isAdmin', isAdmin);
+
+      if (isAdmin) {
+        navigate('/admin/products');
+      } else {
+        navigate('/');
+      }
+
     } catch (err) {
       console.error('Login error:', err.response?.data || err.message);
       alert(err.response?.data?.message || 'Login failed');
@@ -35,7 +45,7 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Welcome Back 👋</h2>
+        <h2>Welcome To Presento Treasure💞</h2>
         <p className="subtitle">Login to your account</p>
 
         <form onSubmit={handleSubmit}>

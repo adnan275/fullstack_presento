@@ -1,0 +1,442 @@
+.profile-page {
+  padding: 6rem min(6vw, 4rem);
+  background: var(--gray-50);
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s ease-out;
+  
+  background-image:
+    radial-gradient(circle at center, rgba(251, 207, 232, 0.3), transparent 60%),
+    linear-gradient(135deg, #fff1f2 0%, #fff 100%);
+}
+
+.profile-hero {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 4rem 5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: var(--gradient-primary);
+}
+
+.profile-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.1), transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.profile-hero h1 {
+  font-size: 3rem;
+  margin-bottom: 2.5rem;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.profile-info h3 {
+  font-size: 1.8rem;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.profile-info p {
+  color: var(--gray-500);
+  font-size: 1.2rem;
+  margin: 0 0 2rem;
+  background: var(--gray-50);
+  padding: 0.5rem 1.5rem;
+  border-radius: var(--radius-full);
+}
+
+.profile-info .btn-primary {
+  width: 100%;
+  max-width: 240px;
+  background: white;
+  color: var(--gray-700);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+}
+
+.profile-info .btn-primary:hover {
+  background: #fff1f2;
+  border-color: var(--primary-pink);
+  color: var(--primary-pink);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 4rem 2rem;
+  }
+
+  .profile-hero {
+    padding: 3rem 2.5rem;
+  }
+
+  .profile-hero h1 {
+    font-size: 2.5rem;
+  }
+
+  .profile-info h3 {
+    font-size: 1.5rem;
+  }
+
+  .profile-info p {
+    font-size: 1.1rem;
+  }
+
+  .profile-addresses {
+    padding: 0 1.5rem;
+    margin: 3rem auto;
+  }
+
+  .profile-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .profile-section-header .btn-secondary {
+    width: 100%;
+  }
+
+  .address-list {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .address-form {
+    padding: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-page {
+    padding: 3rem 1rem;
+  }
+
+  .profile-hero {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .profile-hero h1 {
+    font-size: 2rem;
+  }
+
+  .profile-info h3 {
+    font-size: 1.35rem;
+  }
+
+  .profile-info p {
+    font-size: 1rem;
+    padding: 0.4rem 1.25rem;
+  }
+
+  .profile-addresses {
+    padding: 0 1rem;
+    margin: 2.5rem auto;
+  }
+
+  .profile-section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .address-form {
+    padding: 1.25rem;
+  }
+
+  .address-card {
+    padding: 1.25rem;
+  }
+
+  .address-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .address-content p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding: 2rem 1rem;
+  }
+
+  .profile-hero {
+    padding: 2rem 1.25rem;
+  }
+
+  .profile-hero h1 {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .profile-hero::before {
+    height: 6px;
+  }
+
+  .profile-info {
+    gap: 1.25rem;
+  }
+
+  .profile-info h3 {
+    font-size: 1.25rem;
+  }
+
+  .profile-section-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .profile-section-header .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .address-form {
+    padding: 1rem;
+  }
+
+  .address-form h3 {
+    font-size: 1.25rem;
+  }
+
+  .address-form input {
+    padding: 0.7rem 0.875rem;
+    font-size: 0.95rem;
+  }
+
+  .address-form .btn-primary {
+    padding: 0.8rem 1.75rem;
+    font-size: 0.95rem;
+  }
+
+  .address-card {
+    padding: 1rem;
+  }
+
+  .address-actions {
+    flex-wrap: wrap;
+  }
+
+  .address-actions button {
+    font-size: 0.85rem;
+  }
+}
+
+.profile-addresses {
+  max-width: var(--container-width);
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+
+.profile-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.profile-section-header h2 {
+  font-size: 1.8rem;
+  color: var(--gray-900);
+}
+
+.profile-section-header .btn-secondary {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25);
+  letter-spacing: 0.02em;
+}
+
+.profile-section-header .btn-secondary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.35);
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+}
+
+.profile-section-header .btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.address-form {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 3rem;
+  border: 1px solid var(--gray-100);
+}
+
+.address-form h3 {
+  margin-bottom: 1.5rem;
+  color: var(--primary-pink);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.address-form input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.address-form input:focus {
+  border-color: var(--primary-pink);
+  outline: none;
+}
+
+.address-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.address-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-100);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease;
+}
+
+.address-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.address-content h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--gray-900);
+}
+
+.address-content p {
+  color: var(--gray-600);
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.address-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 1rem;
+}
+
+.address-actions button {
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.address-actions button:first-child {
+  color: var(--primary-pink);
+}
+
+.address-actions .delete-btn {
+  color: var(--gray-500);
+}
+
+.address-actions .delete-btn:hover {
+  color: #ef4444;
+}
+
+.no-data {
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+.error-msg {
+  color: #ef4444;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.address-form .btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25);
+  letter-spacing: 0.02em;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.address-form .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.35);
+  background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+}
+
+.address-form .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}

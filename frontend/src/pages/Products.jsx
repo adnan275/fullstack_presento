@@ -17,7 +17,7 @@ export default function Products() {
   const { fetchProducts } = useProducts();
 
   useEffect(() => {
-    
+
     const adminFlag = localStorage.getItem("isAdmin") === "true";
     setIsAdmin(adminFlag);
 
@@ -80,6 +80,11 @@ export default function Products() {
   return (
     <div className="products-page">
       <header className="products-header">
+        <div className="header-top">
+          <button onClick={handleLogout} className="btn-logout">
+            Logout
+          </button>
+        </div>
         <div className="header-content">
           <div className="header-left">
             <h1>
@@ -91,36 +96,29 @@ export default function Products() {
                 : "Discover our latest beautiful collection"}
             </p>
           </div>
-          <div className="header-right">
-            {isAdmin && (
-              <>
-                <button
-                  onClick={() => setShowAddForm(!showAddForm)}
-                  className="btn-add-product"
-                >
-                  {showAddForm ? "✕ Close" : "➕ Add Product"}
-                </button>
-                <button
-                  onClick={() => setShowOrderModal(true)}
-                  className="btn-track-orders"
-                >
-                  📦 Track Orders
-                </button>
-              </>
-            )}
-            <button onClick={handleLogout} className="btn-logout">
-              Logout
-            </button>
-          </div>
+          {isAdmin && (
+            <div className="header-actions">
+              <button
+                onClick={() => setShowAddForm(!showAddForm)}
+                className="btn-add-product"
+              >
+                {showAddForm ? "✕ Close" : "➕ Add Product"}
+              </button>
+              <button
+                onClick={() => setShowOrderModal(true)}
+                className="btn-track-orders"
+              >
+                📦 Track Orders
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
-      {}
       {isAdmin && showAddForm && (
         <AddProductForm onProductAdded={handleProductAdded} />
       )}
 
-      {}
       {isAdmin && (
         <OrderTrackingModal
           isOpen={showOrderModal}
@@ -128,7 +126,6 @@ export default function Products() {
         />
       )}
 
-      {}
       <div className="products-container">
         {products.length === 0 ? (
           <div className="no-products">
@@ -183,6 +180,10 @@ export default function Products() {
           <p>💡 Stock updates every 3 seconds for real-time tracking</p>
         </div>
       )}
+
+      <footer className="admin-footer">
+        <p>&copy; {new Date().getFullYear()} Presento Treasure. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

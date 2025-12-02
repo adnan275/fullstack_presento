@@ -149,13 +149,6 @@ export default function UserProducts({ defaultTab = "products" }) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("isAdmin");
-    navigate("/login");
-  };
-
   const handleOpenReviewModal = (product) => {
     setReviewProduct(product);
     setShowReviewModal(true);
@@ -297,15 +290,10 @@ export default function UserProducts({ defaultTab = "products" }) {
             <h1>{activeTab === "products" ? "🛍️ Shop" : "📦 My Orders"}</h1>
             <p>{activeTab === "products" ? "Browse our curated collection" : "Track your recent purchases"}</p>
           </div>
-          <div className="header-right">
-            <button onClick={handleLogout} className="btn-logout">
-              Logout
-            </button>
-          </div>
         </div>
       </header>
 
-      {}
+      { }
       {errorMessage && (
         <div className="message-banner error-banner">
           <span>{errorMessage}</span>
@@ -318,7 +306,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      {}
+      { }
       {successMessage && (
         <div className="message-banner success-banner">
           <span>{successMessage}</span>
@@ -331,7 +319,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      {}
+      { }
       <div className="user-tabs" style={{ display: "none" }}>
         <button
           className={`tab ${activeTab === "products" ? "active" : ""}`}
@@ -347,7 +335,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         </button>
       </div>
 
-      {}
+      { }
       <div className="page-title-section" style={{ padding: "0 2rem", marginBottom: "1rem" }}>
         {activeTab === "products" ? (
           <h2>All Products ({products.length})</h2>
@@ -356,12 +344,12 @@ export default function UserProducts({ defaultTab = "products" }) {
         )}
       </div>
 
-      {}
+      { }
       {activeTab === "products" && (
         <div className="products-container">
-          {}
+          { }
           <div className="products-controls">
-            {}
+            { }
             <div className="search-bar-wrapper">
               <div className="search-bar">
                 <span className="search-icon">🔍</span>
@@ -384,7 +372,7 @@ export default function UserProducts({ defaultTab = "products" }) {
               </div>
             </div>
 
-            {}
+            { }
             <div className="filter-sort-bar">
               <button
                 className="btn-toggle-filters"
@@ -413,7 +401,7 @@ export default function UserProducts({ defaultTab = "products" }) {
               </div>
             </div>
 
-            {}
+            { }
             <div className={`filters-panel ${showFilters ? "active" : ""}`}>
               <div className="filters-header">
                 <h3>Filters</h3>
@@ -427,7 +415,7 @@ export default function UserProducts({ defaultTab = "products" }) {
               </div>
 
               <div className="filters-content">
-                {}
+                { }
                 <div className="filter-group">
                   <label htmlFor="occasion-select">Occasion</label>
                   <select
@@ -447,7 +435,7 @@ export default function UserProducts({ defaultTab = "products" }) {
                   </select>
                 </div>
 
-                {}
+                { }
                 <div className="filter-group">
                   <label htmlFor="price-range">
                     Price Range: ₹{priceRange.min} - ₹{priceRange.max}
@@ -489,14 +477,14 @@ export default function UserProducts({ defaultTab = "products" }) {
                   />
                 </div>
 
-                {}
+                { }
                 <button className="btn-clear-filters" onClick={clearFilters}>
                   Clear All Filters
                 </button>
               </div>
             </div>
 
-            {}
+            { }
             {showFilters && (
               <div
                 className="filters-overlay"
@@ -505,7 +493,7 @@ export default function UserProducts({ defaultTab = "products" }) {
             )}
           </div>
 
-          {}
+          { }
           {filteredProducts.length === 0 ? (
             <div className="no-products">
               <div className="no-products-icon">🔍</div>
@@ -534,7 +522,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      {}
+      { }
       {activeTab === "orders" && (
         <div className="orders-container">
           {orders.length === 0 ? (
@@ -639,7 +627,7 @@ export default function UserProducts({ defaultTab = "products" }) {
                     </div>
                   </div>
 
-                  {}
+                  { }
                   {order.status === "delivered" && order.items && order.items.length > 0 && (
                     <div className="order-review-section">
                       <h4>Rate Your Purchase</h4>
@@ -663,7 +651,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      {}
+      { }
       <OrderConfirmation
         isOpen={!!orderConfirmation}
         orderId={orderConfirmation?.orderId}
@@ -672,7 +660,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         onClose={() => setOrderConfirmation(null)}
       />
 
-      {}
+      { }
       <ProductModal
         isOpen={showDetailsModal}
         productId={selectedProductId}
@@ -680,7 +668,7 @@ export default function UserProducts({ defaultTab = "products" }) {
         onAddToCart={addToCart}
       />
 
-      {}
+      { }
       {showReviewModal && reviewProduct && (
         <ReviewModal
           productId={reviewProduct.id}

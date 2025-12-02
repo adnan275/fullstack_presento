@@ -18,23 +18,32 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 function App() {
   return (
     <Routes>
-      {}
+      { }
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      {}
+      { }
+      <Route
+        path="/admin/products"
+        element={
+          <ProtectedRoute>
+            <Products />
+          </ProtectedRoute>
+        }
+      />
+
       <Route element={<AppLayout />}>
-        {}
+        { }
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<UserProducts defaultTab="products" />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/products/:id" element={<ProductDetails />} />
 
-        {}
+        { }
         <Route path="/products" element={<Navigate to="/shop" replace />} />
 
-        {}
+        { }
         <Route
           path="/profile"
           element={
@@ -68,7 +77,7 @@ function App() {
           }
         />
 
-        {}
+        { }
         <Route
           path="/user/products"
           element={
@@ -85,14 +94,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/products"
-          element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/add-product"
           element={
@@ -103,7 +105,7 @@ function App() {
         />
       </Route>
 
-      {}
+      { }
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

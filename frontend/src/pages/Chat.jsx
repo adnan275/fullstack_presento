@@ -10,7 +10,7 @@ export default function Chat() {
 
   const handleGenerate = async () => {
     if (!query.trim()) return;
-    
+
     setLoading(true);
     try {
       console.log("Generating response for:", query);
@@ -21,12 +21,6 @@ export default function Chat() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
   };
 
   return (
@@ -40,9 +34,6 @@ export default function Chat() {
           <Link to="/shop" className="btn-nav">
             Products
           </Link>
-          <button onClick={handleLogout} className="btn-logout-chat">
-            Logout
-          </button>
         </div>
       </header>
 

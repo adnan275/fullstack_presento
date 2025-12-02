@@ -29,6 +29,11 @@ export default function UserProducts({ defaultTab = "products" }) {
   const [sortBy, setSortBy] = useState("newest");
   const [showFilters, setShowFilters] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const productsPerPage = 12;
+
   const contactLinks = [
     {
       label: "WhatsApp",
@@ -80,8 +85,12 @@ export default function UserProducts({ defaultTab = "products" }) {
           return;
         }
 
-        const productsData = await fetchProducts();
-        setProducts(productsData);
+        const response = await fetchProducts(currentPage, productsPerPage);
+        setProducts(response.products || []);
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages);
+          setTotalProducts(response.pagination.totalProducts);
+        }
 
         if (user?.id) {
           const ordersData = await fetchUserOrders(user.id);
@@ -95,7 +104,11 @@ export default function UserProducts({ defaultTab = "products" }) {
       }
     }
     loadData();
-  }, [fetchProducts, fetchUserOrders, navigate, defaultTab, location]);
+  }, [fetchProducts, fetchUserOrders, navigate, defaultTab, location, currentPage, productsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedOccasion, priceRange.min, priceRange.max, sortBy]);
 
   const handlePlaceOrder = async (productId, quantity) => {
     setErrorMessage("");
@@ -293,7 +306,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       </header>
 
-      { }
       {errorMessage && (
         <div className="message-banner error-banner">
           <span>{errorMessage}</span>
@@ -306,7 +318,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      { }
       {successMessage && (
         <div className="message-banner success-banner">
           <span>{successMessage}</span>
@@ -319,7 +330,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      { }
       <div className="user-tabs" style={{ display: "none" }}>
         <button
           className={`tab ${activeTab === "products" ? "active" : ""}`}
@@ -335,21 +345,17 @@ export default function UserProducts({ defaultTab = "products" }) {
         </button>
       </div>
 
-      { }
       <div className="page-title-section" style={{ padding: "0 2rem", marginBottom: "1rem" }}>
         {activeTab === "products" ? (
-          <h2>All Products ({products.length})</h2>
+          <h2>All Products ({totalProducts})</h2>
         ) : (
           <h2>My Orders ({orders.length})</h2>
         )}
       </div>
 
-      { }
       {activeTab === "products" && (
         <div className="products-container">
-          { }
           <div className="products-controls">
-            { }
             <div className="search-bar-wrapper">
               <div className="search-bar">
                 <span className="search-icon">🔍</span>
@@ -372,7 +378,6 @@ export default function UserProducts({ defaultTab = "products" }) {
               </div>
             </div>
 
-            { }
             <div className="filter-sort-bar">
               <button
                 className="btn-toggle-filters"
@@ -382,7 +387,7 @@ export default function UserProducts({ defaultTab = "products" }) {
               </button>
 
               <div className="results-info">
-                Showing <strong>{filteredProducts.length}</strong> of <strong>{products.length}</strong> products
+                Showing <strong>{filteredProducts.length > 0 ? ((currentPage - 1) * productsPerPage + 1) : 0}-{Math.min(currentPage * productsPerPage, filteredProducts.length)}</strong> of <strong>{totalProducts}</strong> products
               </div>
 
               <div className="sort-dropdown">
@@ -401,7 +406,6 @@ export default function UserProducts({ defaultTab = "products" }) {
               </div>
             </div>
 
-            { }
             <div className={`filters-panel ${showFilters ? "active" : ""}`}>
               <div className="filters-header">
                 <h3>Filters</h3>
@@ -415,7 +419,6 @@ export default function UserProducts({ defaultTab = "products" }) {
               </div>
 
               <div className="filters-content">
-                { }
                 <div className="filter-group">
                   <label htmlFor="occasion-select">Occasion</label>
                   <select
@@ -435,7 +438,6 @@ export default function UserProducts({ defaultTab = "products" }) {
                   </select>
                 </div>
 
-                { }
                 <div className="filter-group">
                   <label htmlFor="price-range">
                     Price Range: ₹{priceRange.min} - ₹{priceRange.max}
@@ -477,14 +479,12 @@ export default function UserProducts({ defaultTab = "products" }) {
                   />
                 </div>
 
-                { }
                 <button className="btn-clear-filters" onClick={clearFilters}>
                   Clear All Filters
                 </button>
               </div>
             </div>
 
-            { }
             {showFilters && (
               <div
                 className="filters-overlay"
@@ -493,7 +493,6 @@ export default function UserProducts({ defaultTab = "products" }) {
             )}
           </div>
 
-          { }
           {filteredProducts.length === 0 ? (
             <div className="no-products">
               <div className="no-products-icon">🔍</div>
@@ -504,25 +503,86 @@ export default function UserProducts({ defaultTab = "products" }) {
               </button>
             </div>
           ) : (
-            <div className="products-grid">
-              {filteredProducts.map((product) => (
-                <ProductCardUser
-                  key={product.id}
-                  product={product}
-                  onProductClick={(productId) => {
-                    setSelectedProductId(productId);
-                    setShowDetailsModal(true);
-                  }}
-                  onAddToCart={addToCart}
-                  onViewDetails={(productId) => navigate(`/products/${productId}`)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="products-grid">
+                {filteredProducts.map((product) => (
+                  <ProductCardUser
+                    key={product.id}
+                    product={product}
+                    onProductClick={(productId) => {
+                      setSelectedProductId(productId);
+                      setShowDetailsModal(true);
+                    }}
+                    onAddToCart={addToCart}
+                    onViewDetails={(productId) => navigate(`/products/${productId}`)}
+                  />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="pagination-container">
+                  <button
+                    className="pagination-btn pagination-prev"
+                    onClick={() => {
+                      setCurrentPage((prev) => prev - 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={currentPage === 1}
+                  >
+                    ← Previous
+                  </button>
+
+                  <div className="pagination-numbers">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                      if (
+                        pageNum === 1 ||
+                        pageNum === totalPages ||
+                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={pageNum}
+                            className={`pagination-btn pagination-number ${pageNum === currentPage ? "active" : ""
+                              }`}
+                            onClick={() => {
+                              setCurrentPage(pageNum);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      } else if (
+                        pageNum === currentPage - 2 ||
+                        pageNum === currentPage + 2
+                      ) {
+                        return (
+                          <span key={pageNum} className="pagination-ellipsis">
+                            ...
+                          </span>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <button
+                    className="pagination-btn pagination-next"
+                    onClick={() => {
+                      setCurrentPage((prev) => prev + 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
 
-      { }
       {activeTab === "orders" && (
         <div className="orders-container">
           {orders.length === 0 ? (
@@ -627,7 +687,6 @@ export default function UserProducts({ defaultTab = "products" }) {
                     </div>
                   </div>
 
-                  { }
                   {order.status === "delivered" && order.items && order.items.length > 0 && (
                     <div className="order-review-section">
                       <h4>Rate Your Purchase</h4>
@@ -651,7 +710,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         </div>
       )}
 
-      { }
       <OrderConfirmation
         isOpen={!!orderConfirmation}
         orderId={orderConfirmation?.orderId}
@@ -660,7 +718,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         onClose={() => setOrderConfirmation(null)}
       />
 
-      { }
       <ProductModal
         isOpen={showDetailsModal}
         productId={selectedProductId}
@@ -668,7 +725,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         onAddToCart={addToCart}
       />
 
-      { }
       {showReviewModal && reviewProduct && (
         <ReviewModal
           productId={reviewProduct.id}

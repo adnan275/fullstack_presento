@@ -51,8 +51,32 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const products = await prisma.product.findMany({ orderBy: { createdAt: "desc" } });
-    res.json(products);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const skip = (page - 1) * limit;
+
+    const [products, totalProducts] = await Promise.all([
+      prisma.product.findMany({
+        orderBy: { createdAt: "desc" },
+        skip: skip,
+        take: limit,
+      }),
+      prisma.product.count(),
+    ]);
+
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    res.json({
+      products,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    });
   } catch (err) {
     console.error("Products fetch error:", err);
     res.status(500).json({ error: err.message });
@@ -93,7 +117,7 @@ router.delete("/:id", auth, async (req, res) => {
       where: { id: productId },
     });
 
-    console.log("✅ Product deleted:", product.name, "(ID:", id, ") - Removed from", );
+    console.log("✅ Product deleted:", product.name, "(ID:", id, ") - Removed from",);
     res.json({
       success: true,
       message: "Product deleted successfully",

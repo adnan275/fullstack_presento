@@ -5,11 +5,11 @@ export function useProducts() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (page = 1, limit = 12) => {
     setLoading(true);
     setError("");
     try {
-      const res = await api.get("/products");
+      const res = await api.get(`/products?page=${page}&limit=${limit}`);
       return res.data;
     } catch (err) {
       const errorMsg = err.response?.data?.error || "Failed to fetch products";

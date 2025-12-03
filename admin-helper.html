@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Access Helper</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #ec4899;
+            margin-bottom: 1rem;
+        }
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        button {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin: 0.5rem;
+        }
+        button:hover {
+            transform: translateY(-3px);
+        }
+        .success {
+            background: #10b981;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            display: none;
+        }
+        .link {
+            color: #ec4899;
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Admin Access Helper</h1>
+        <p>Click the button below to enable admin access, then navigate to the admin page.</p>
+        
+        <button onclick="enableAdmin()">Enable Admin Access</button>
+        <button onclick="goToAdmin()">Go to Admin Page</button>
+        
+        <div id="success" class="success">
+            ✅ Admin access enabled! You can now access the admin page.
+        </div>
+        
+        <p style="margin-top: 2rem; font-size: 0.9rem;">
+            <strong>Admin Page URL:</strong><br>
+            <a href="http://localhost:5174/admin/products" class="link">
+                http://localhost:5174/admin/products
+            </a>
+        </p>
+    </div>
+
+    <script>
+        function enableAdmin() {
+            localStorage.setItem("isAdmin", "true");
+            document.getElementById('success').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('success').style.display = 'none';
+            }, 3000);
+        }
+
+        function goToAdmin() {
+            localStorage.setItem("isAdmin", "true");
+            window.location.href = 'http://localhost:5174/admin/products';
+        }
+    </script>
+</body>
+</html>

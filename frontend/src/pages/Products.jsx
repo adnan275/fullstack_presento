@@ -23,8 +23,8 @@ export default function Products() {
 
     async function load() {
       try {
-        const productsData = await fetchProducts();
-        setProducts(productsData);
+        const response = await fetchProducts(1, 1000);
+        setProducts(response.products || response);
       } catch (err) {
         console.error("Products fetch error:", err);
       } finally {
@@ -35,8 +35,8 @@ export default function Products() {
 
     const interval = setInterval(async () => {
       try {
-        const productsData = await fetchProducts();
-        setProducts(productsData);
+        const response = await fetchProducts(1, 1000);
+        setProducts(response.products || response);
       } catch (err) {
         console.error("Auto-refresh error:", err);
       }
@@ -161,8 +161,8 @@ export default function Products() {
                       { headers: { Authorization: `Bearer ${token}` } }
                     );
                     alert("Order placed successfully!");
-                    const productsData = await fetchProducts();
-                    setProducts(productsData);
+                    const response = await fetchProducts(1, 1000);
+                    setProducts(response.products || response);
                   } catch (err) {
                     alert("Failed to place order: " + (err.response?.data?.error || err.message));
                   }

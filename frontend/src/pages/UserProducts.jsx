@@ -72,7 +72,7 @@ export default function UserProducts({ defaultTab = "products" }) {
     }
   }, [location, navigate]);
 
-  const { fetchProducts } = useProducts();
+  const { fetchAllProducts } = useProducts();
   const { fetchUserOrders, createOrder } = useOrders();
 
   useEffect(() => {
@@ -85,12 +85,10 @@ export default function UserProducts({ defaultTab = "products" }) {
           return;
         }
 
-        const response = await fetchProducts(currentPage, productsPerPage);
-        setProducts(response.products || []);
-        if (response.pagination) {
-          setTotalPages(response.pagination.totalPages);
-          setTotalProducts(response.pagination.totalProducts);
-        }
+        const response = await fetchAllProducts();
+        const allProducts = response.products || response || [];
+        setProducts(allProducts);
+        setTotalProducts(allProducts.length);
 
         if (user?.id) {
           const ordersData = await fetchUserOrders(user.id);
@@ -104,7 +102,7 @@ export default function UserProducts({ defaultTab = "products" }) {
       }
     }
     loadData();
-  }, [fetchProducts, fetchUserOrders, navigate, defaultTab, location, currentPage, productsPerPage]);
+  }, [fetchAllProducts, fetchUserOrders, navigate, defaultTab]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -247,7 +245,15 @@ export default function UserProducts({ defaultTab = "products" }) {
     return filtered;
   };
 
-  const filteredProducts = getFilteredAndSortedProducts();
+  const allFilteredProducts = getFilteredAndSortedProducts();
+
+  const totalFilteredProducts = allFilteredProducts.length;
+  const totalPagesForFiltered = Math.ceil(totalFilteredProducts / productsPerPage);
+
+  const paginatedProducts = allFilteredProducts.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  );
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -387,7 +393,7 @@ export default function UserProducts({ defaultTab = "products" }) {
               </button>
 
               <div className="results-info">
-                Showing <strong>{filteredProducts.length > 0 ? ((currentPage - 1) * productsPerPage + 1) : 0}-{Math.min(currentPage * productsPerPage, filteredProducts.length)}</strong> of <strong>{totalProducts}</strong> products
+                Showing <strong>{totalFilteredProducts > 0 ? ((currentPage - 1) * productsPerPage + 1) : 0}-{Math.min(currentPage * productsPerPage, totalFilteredProducts)}</strong> of <strong>{totalFilteredProducts}</strong> products
               </div>
 
               <div className="sort-dropdown">
@@ -493,7 +499,7 @@ export default function UserProducts({ defaultTab = "products" }) {
             )}
           </div>
 
-          {filteredProducts.length === 0 ? (
+          {totalFilteredProducts === 0 ? (
             <div className="no-products">
               <div className="no-products-icon">🔍</div>
               <h3>No products found</h3>
@@ -505,7 +511,7 @@ export default function UserProducts({ defaultTab = "products" }) {
           ) : (
             <>
               <div className="products-grid">
-                {filteredProducts.map((product) => (
+                {paginatedProducts.map((product) => (
                   <ProductCardUser
                     key={product.id}
                     product={product}
@@ -519,7 +525,7 @@ export default function UserProducts({ defaultTab = "products" }) {
                 ))}
               </div>
 
-              {totalPages > 1 && (
+              {totalPagesForFiltered > 1 && (
                 <div className="pagination-container">
                   <button
                     className="pagination-btn pagination-prev"
@@ -533,10 +539,10 @@ export default function UserProducts({ defaultTab = "products" }) {
                   </button>
 
                   <div className="pagination-numbers">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                    {Array.from({ length: totalPagesForFiltered }, (_, i) => i + 1).map((pageNum) => {
                       if (
                         pageNum === 1 ||
-                        pageNum === totalPages ||
+                        pageNum === totalPagesForFiltered ||
                         (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
                       ) {
                         return (
@@ -572,7 +578,7 @@ export default function UserProducts({ defaultTab = "products" }) {
                       setCurrentPage((prev) => prev + 1);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    disabled={currentPage === totalPages}
+                    disabled={currentPage === totalPagesForFiltered}
                   >
                     Next →
                   </button>

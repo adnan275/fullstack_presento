@@ -9,6 +9,8 @@ export default function AddProductForm({ onProductAdded }) {
     price: "",
     stock: "",
     category: "Electronics",
+    badge: "",
+    isFeatured: false,
   });
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -17,10 +19,10 @@ export default function AddProductForm({ onProductAdded }) {
   const [success, setSuccess] = useState("");
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -71,6 +73,10 @@ export default function AddProductForm({ onProductAdded }) {
       submitData.append("price", parseFloat(formData.price));
       submitData.append("stock", parseInt(formData.stock));
       submitData.append("category", formData.category);
+      if (formData.badge) {
+        submitData.append("badge", formData.badge);
+      }
+      submitData.append("isFeatured", formData.isFeatured);
       submitData.append("image", image);
 
       const token = localStorage.getItem("token");
@@ -88,6 +94,8 @@ export default function AddProductForm({ onProductAdded }) {
         price: "",
         stock: "",
         category: "Electronics",
+        badge: "",
+        isFeatured: false,
       });
       setImage(null);
       setImagePreview(null);
@@ -191,6 +199,41 @@ export default function AddProductForm({ onProductAdded }) {
                 min="0"
                 step="1"
               />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="badge">Badge (Optional)</label>
+              <select
+                id="badge"
+                name="badge"
+                value={formData.badge}
+                onChange={handleInputChange}
+                disabled={loading}
+              >
+                <option value="">None</option>
+                <option value="Best Seller">Best Seller</option>
+                <option value="New Arrival">New Arrival</option>
+                <option value="Popular">Popular</option>
+                <option value="Trending">Trending</option>
+                <option value="Limited Edition">Limited Edition</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="isFeatured" style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input
+                  id="isFeatured"
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleInputChange}
+                  disabled={loading}
+                  style={{ width: "auto", margin: 0 }}
+                />
+                <span>Featured on Home Page</span>
+              </label>
             </div>
           </div>
         </div>

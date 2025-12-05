@@ -41,6 +41,8 @@ model Product {
   stock       Int
   category    String
   imageUrl    String
+  badge       String?
+  isFeatured  Boolean     @default(false)
   orderItems  OrderItem[]
   reviews     Review[]
   createdAt   DateTime    @default(now())

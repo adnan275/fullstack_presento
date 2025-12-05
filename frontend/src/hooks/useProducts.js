@@ -39,10 +39,26 @@ export function useProducts() {
     }
   }, []);
 
+  const fetchAllProducts = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await api.get(`/products?page=1&limit=10000`);
+      return res.data;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || "Failed to fetch products";
+      setError(errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
     fetchProducts,
+    fetchAllProducts,
     fetchProductById,
   };
 }

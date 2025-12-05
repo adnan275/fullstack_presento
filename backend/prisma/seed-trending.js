@@ -8,43 +8,53 @@ async function main() {
     const products = [
         {
             name: 'Personalized Name Ring',
-            description: 'Elegant personalized name ring with timeless design. Perfect gift for loved ones.',
-            price: 1299,
-            stock: 50,
-            category: 'Jewelry',
-            imageUrl: '/trending/ring.png'
+            description: 'Elegant personalized ring with custom name engraving. Perfect gift for loved ones.',
+            price: 599,
+            stock: 100,
+            category: 'Personalized Jewelry',
+            imageUrl: '/assets/trending_2.png',
+            badge: 'Best Seller',
+            isFeatured: true
         },
         {
             name: 'Luxury Gift Hamper',
-            description: 'Perfect luxury gift hamper curated for her with premium items and elegant packaging.',
-            price: 2499,
-            stock: 30,
-            category: 'Gift Hampers',
-            imageUrl: '/trending/hamper.jpg'
+            description: 'Curated luxury hamper with premium items and beautiful packaging. Perfect for her.',
+            price: 1599,
+            stock: 40,
+            category: 'Hamper',
+            imageUrl: '/assets/trending_5.jpg',
+            badge: 'New Arrival',
+            isFeatured: true
         },
         {
             name: 'Anniversary LED Lamp',
-            description: 'Capture special moments with this customizable LED lamp. Perfect anniversary gift.',
+            description: 'Beautiful LED lamp with custom anniversary message. Capture the moment.',
             price: 899,
-            stock: 45,
-            category: 'Home Decor',
-            imageUrl: '/trending/lamp.png'
+            stock: 75,
+            category: 'Anniversary Gift',
+            imageUrl: '/assets/trending_4.png',
+            badge: 'Popular',
+            isFeatured: true
         },
         {
-            name: 'Premium Mens Combo',
-            description: 'Classy and functional combo set for men including wallet, pen, and keychain.',
-            price: 1799,
-            stock: 25,
-            category: 'Mens Accessories',
-            imageUrl: '/trending/wallet-set.jpg'
+            name: 'Premium Men\'s Combo',
+            description: 'Luxury gift set for men with wallet, pen, and accessories. Classy and functional.',
+            price: 1899,
+            stock: 30,
+            category: 'Gift Set',
+            imageUrl: '/assets/trending_3.jpg',
+            badge: 'Trending',
+            isFeatured: true
         },
         {
             name: 'Ultimate Surprise Box',
-            description: 'Limited edition surprise box to unwrap happiness. Curated with love and care.',
-            price: 3499,
-            stock: 15,
-            category: 'Gift Hampers',
-            imageUrl: '/trending/gift-box.jpg'
+            description: 'A delightful surprise box filled with personalized gifts and treats. Unwrap happiness!',
+            price: 1299,
+            stock: 50,
+            category: 'Birthday Gift',
+            imageUrl: '/assets/trending_1.jpg',
+            badge: 'Limited Edition',
+            isFeatured: true
         }
     ];
 

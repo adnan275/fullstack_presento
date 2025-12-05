@@ -32,17 +32,6 @@ export default function Products() {
       }
     }
     load();
-
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetchProducts(1, 1000);
-        setProducts(response.products || response);
-      } catch (err) {
-        console.error("Auto-refresh error:", err);
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
   }, [fetchProducts]);
 
   const handleLogout = () => {
@@ -174,12 +163,6 @@ export default function Products() {
           </div>
         )}
       </div>
-
-      {isAdmin && (
-        <div className="admin-info">
-          <p>💡 Stock updates every 3 seconds for real-time tracking</p>
-        </div>
-      )}
 
       <footer className="admin-footer">
         <p>&copy; {new Date().getFullYear()} Presento Treasure. All rights reserved.</p>

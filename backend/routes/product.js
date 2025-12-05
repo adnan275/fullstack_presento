@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post("/", auth, upload.single("image"), async (req, res) => {
   try {
-    const { name, description, price, stock, category } = req.body;
+    const { name, description, price, stock, category, badge, isFeatured } = req.body;
     let imageUrl = "";
 
     if (req.file) {
@@ -31,15 +31,22 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       }
     }
 
+    const productData = {
+      name,
+      description,
+      price: Number(price),
+      stock: Number(stock),
+      category,
+      imageUrl,
+      isFeatured: isFeatured === "true" || isFeatured === true,
+    };
+
+    if (badge) {
+      productData.badge = badge;
+    }
+
     const product = await prisma.product.create({
-      data: {
-        name,
-        description,
-        price: Number(price),
-        stock: Number(stock),
-        category,
-        imageUrl,
-      },
+      data: productData,
     });
 
     res.status(201).json(product);

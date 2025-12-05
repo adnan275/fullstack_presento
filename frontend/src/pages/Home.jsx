@@ -22,36 +22,37 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    async function fetchTrendingProducts() {
+    async function fetchFeaturedProducts() {
       try {
         const { data } = await api.get("/products");
-        
-        const trending = data.filter(p => p.id >= 15 && p.id <= 19);
-        setTrendingProducts(trending.length > 0 ? trending : data.slice(0, 5));
+        const featured = data.products ? data.products.filter(p => p.isFeatured) : data.filter(p => p.isFeatured);
+        setTrendingProducts(featured.length > 0 ? featured : (data.products || data).slice(0, 5));
       } catch (err) {
-        console.error("Error fetching trending products:", err);
+        console.error("Error fetching featured products:", err);
       } finally {
         setLoading(false);
       }
     }
-    fetchTrendingProducts();
+    fetchFeaturedProducts();
   }, []);
 
   const handleProductClick = (productId) => {
     navigate(`/products/${productId}`);
   };
 
-  const getBadge = (index, productName) => {
-    if (productName.includes("Ring")) return { text: "Best Seller", class: "" };
-    if (productName.includes("Hamper")) return { text: "New Arrival", class: "new" };
-    if (productName.includes("Lamp")) return { text: "Popular", class: "popular" };
-    if (productName.includes("Surprise")) return { text: "Limited Edition", class: "limited" };
-    return null;
+  const getBadgeClass = (badgeText) => {
+    if (!badgeText) return "";
+    if (badgeText === "Best Seller") return "";
+    if (badgeText === "New Arrival") return "new";
+    if (badgeText === "Popular") return "popular";
+    if (badgeText === "Limited Edition") return "limited";
+    if (badgeText === "Trending") return "trending";
+    return "";
   };
 
   return (
     <div className="home-page">
-      {}
+      { }
       <section className="home-hero">
         <div className="home-hero__content">
           <p className="home-pill">Presento Treasure</p>
@@ -82,7 +83,7 @@ export default function Home() {
         </div>
       </section>
 
-      {}
+      { }
       <section className="trending-section">
         <div className="trending-container">
           <div className="trending-header">
@@ -95,8 +96,8 @@ export default function Home() {
           ) : (
             <>
               <div className="trending-grid">
-                {trendingProducts.map((product, index) => {
-                  const badge = getBadge(index, product.name);
+                {trendingProducts.map((product) => {
+                  const badgeClass = getBadgeClass(product.badge);
                   return (
                     <div
                       key={product.id}
@@ -106,7 +107,7 @@ export default function Home() {
                     >
                       <div className="trending-image-wrapper">
                         <img src={product.imageUrl} alt={product.name} />
-                        {badge && <span className={`trending-badge ${badge.class}`}>{badge.text}</span>}
+                        {product.badge && <span className={`trending-badge ${badgeClass}`}>{product.badge}</span>}
                       </div>
                       <div className="trending-info">
                         <h3>{product.name}</h3>
@@ -128,7 +129,7 @@ export default function Home() {
         </div>
       </section>
 
-      {}
+      { }
       <section className="home-section home-card--about">
         <h2>About Us !</h2>
         <p>
@@ -137,14 +138,14 @@ export default function Home() {
         </p>
       </section>
 
-      {}
+      { }
       <section className="home-section home-card--occasions">
         <h2>For Every Occasion</h2>
         <p>Weddings | Birthdays | Anniversaries | Festive Moments</p>
         <span>We make celebrations unforgettable!</span>
       </section>
 
-      {}
+      { }
       <section className="home-section home-card--offerings">
         <h2>What We Offer</h2>
         <div className="home-offerings-grid">
@@ -157,7 +158,7 @@ export default function Home() {
         </div>
       </section>
 
-      {}
+      { }
       <section className="home-why">
         <h2>Why Choose Presento Treasure?</h2>
         <div className="home-why__grid">
@@ -170,7 +171,7 @@ export default function Home() {
         </div>
       </section>
 
-      {}
+      { }
       <section className="home-section home-card--cta">
         <h2>Let Presento Treasure be part of your next celebration!</h2>
         <p>DM us for orders | Follow for ideas</p>

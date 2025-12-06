@@ -41,6 +41,15 @@ export default function Checkout() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
+    if (!userId || !token) {
+      navigate("/login", {
+        state: { from: location },
+        replace: true
+      });
+    }
+  }, [userId, token, navigate, location]);
+
+  useEffect(() => {
     if (userId && token) {
       axios
         .get("http://localhost:4000/api/addresses", {
@@ -49,7 +58,7 @@ export default function Checkout() {
         .then((res) => {
           setSavedAddresses(res.data);
           if (res.data.length > 0) {
-            
+
             const recent = res.data[0];
             setSelectedAddressId(recent.id);
             setDetails({
@@ -89,7 +98,7 @@ export default function Checkout() {
           setDetails({ ...emptyDetails, ...parsed });
         }
       } catch {
-        
+
       }
     }
     setLoading(false);
@@ -100,7 +109,7 @@ export default function Checkout() {
       try {
         localStorage.setItem(storageKey, JSON.stringify(details));
       } catch {
-        
+
       }
     }
   }, [details, loading, storageKey, selectedAddressId]);
@@ -109,7 +118,7 @@ export default function Checkout() {
     const { name, value } = e.target;
     setDetails((prev) => ({ ...prev, [name]: value }));
     if (selectedAddressId !== "new") {
-      setSelectedAddressId("new"); 
+      setSelectedAddressId("new");
     }
   };
 
@@ -167,7 +176,7 @@ export default function Checkout() {
     setError("");
 
     try {
-      
+
       if (selectedAddressId === "new") {
         await axios.post(
           "http://localhost:4000/api/addresses",

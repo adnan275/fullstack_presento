@@ -8,6 +8,17 @@ export default function CartPage() {
 
   const handleBuyNow = () => {
     if (!selectedItems.length) return;
+
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
+    if (!token || !user) {
+      navigate("/login", {
+        state: { from: { pathname: "/checkout" } }
+      });
+      return;
+    }
+
     navigate("/checkout");
   };
 

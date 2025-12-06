@@ -23,17 +23,6 @@ export default function UserProducts({ defaultTab = "products" }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewProduct, setReviewProduct] = useState(null);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedOccasion, setSelectedOccasion] = useState("all");
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
-  const [sortBy, setSortBy] = useState("newest");
-  const [showFilters, setShowFilters] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const productsPerPage = 12;
-
   const contactLinks = [
     {
       label: "WhatsApp",
@@ -88,7 +77,6 @@ export default function UserProducts({ defaultTab = "products" }) {
         const response = await fetchAllProducts();
         const allProducts = response.products || response || [];
         setProducts(allProducts);
-        setTotalProducts(allProducts.length);
 
         if (user?.id) {
           const ordersData = await fetchUserOrders(user.id);
@@ -103,10 +91,6 @@ export default function UserProducts({ defaultTab = "products" }) {
     }
     loadData();
   }, [fetchAllProducts, fetchUserOrders, navigate, defaultTab]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedOccasion, priceRange.min, priceRange.max, sortBy]);
 
   const handlePlaceOrder = async (productId, quantity) => {
     setErrorMessage("");
@@ -196,70 +180,6 @@ export default function UserProducts({ defaultTab = "products" }) {
       default:
         return "#999";
     }
-  };
-
-  const getFilteredAndSortedProducts = () => {
-    let filtered = [...products];
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.description.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
-      );
-    }
-
-    if (selectedOccasion !== "all") {
-      filtered = filtered.filter((p) =>
-        p.category.toLowerCase().includes(selectedOccasion.toLowerCase())
-      );
-    }
-
-    filtered = filtered.filter(
-      (p) => p.price >= priceRange.min && p.price <= priceRange.max
-    );
-
-    switch (sortBy) {
-      case "price-low":
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case "price-high":
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case "newest":
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      case "popular":
-        filtered.sort((a, b) => {
-          const aReviews = a.reviews?.length || 0;
-          const bReviews = b.reviews?.length || 0;
-          return bReviews - aReviews;
-        });
-        break;
-      default:
-        break;
-    }
-
-    return filtered;
-  };
-
-  const allFilteredProducts = getFilteredAndSortedProducts();
-
-  const totalFilteredProducts = allFilteredProducts.length;
-  const totalPagesForFiltered = Math.ceil(totalFilteredProducts / productsPerPage);
-
-  const paginatedProducts = allFilteredProducts.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  );
-
-  const clearFilters = () => {
-    setSearchQuery("");
-    setSelectedOccasion("all");
-    setPriceRange({ min: 0, max: 10000 });
-    setSortBy("newest");
   };
 
   const renderIcon = (type) => {
@@ -353,7 +273,7 @@ export default function UserProducts({ defaultTab = "products" }) {
 
       <div className="page-title-section" style={{ padding: "0 2rem", marginBottom: "1rem" }}>
         {activeTab === "products" ? (
-          <h2>All Products ({totalProducts})</h2>
+          <h2>All Products ({products.length})</h2>
         ) : (
           <h2>My Orders ({orders.length})</h2>
         )}
@@ -361,230 +281,27 @@ export default function UserProducts({ defaultTab = "products" }) {
 
       {activeTab === "products" && (
         <div className="products-container">
-          <div className="products-controls">
-            <div className="search-bar-wrapper">
-              <div className="search-bar">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="text"
-                  placeholder="Search products by name, keyword, or category..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input"
-                />
-                {searchQuery && (
-                  <button
-                    className="clear-search"
-                    onClick={() => setSearchQuery("")}
-                    aria-label="Clear search"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="filter-sort-bar">
-              <button
-                className="btn-toggle-filters"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                🎛️ Filters {(selectedOccasion !== "all" || priceRange.max < 10000) && <span className="filter-badge">●</span>}
-              </button>
-
-              <div className="results-info">
-                Showing <strong>{totalFilteredProducts > 0 ? ((currentPage - 1) * productsPerPage + 1) : 0}-{Math.min(currentPage * productsPerPage, totalFilteredProducts)}</strong> of <strong>{totalFilteredProducts}</strong> products
-              </div>
-
-              <div className="sort-dropdown">
-                <label htmlFor="sort-select">Sort By:</label>
-                <select
-                  id="sort-select"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="popular">Most Loved ❤️</option>
-                </select>
-              </div>
-            </div>
-
-            <div className={`filters-panel ${showFilters ? "active" : ""}`}>
-              <div className="filters-header">
-                <h3>Filters</h3>
-                <button
-                  className="btn-close-filters"
-                  onClick={() => setShowFilters(false)}
-                  aria-label="Close filters"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="filters-content">
-                <div className="filter-group">
-                  <label htmlFor="occasion-select">Occasion</label>
-                  <select
-                    id="occasion-select"
-                    value={selectedOccasion}
-                    onChange={(e) => setSelectedOccasion(e.target.value)}
-                    className="filter-select"
-                  >
-                    <option value="all">All Occasions</option>
-                    <option value="birthday">Birthday 🎂</option>
-                    <option value="anniversary">Anniversary 💑</option>
-                    <option value="wedding">Wedding 💍</option>
-                    <option value="festive">Festive 🎉</option>
-                    <option value="romantic">Romantic 💝</option>
-                    <option value="hamper">Hampers 🎁</option>
-                    <option value="nikah">Nikah Nama 📜</option>
-                  </select>
-                </div>
-
-                <div className="filter-group">
-                  <label htmlFor="price-range">
-                    Price Range: ₹{priceRange.min} - ₹{priceRange.max}
-                  </label>
-                  <div className="price-range-inputs">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      value={priceRange.min}
-                      onChange={(e) =>
-                        setPriceRange({ ...priceRange, min: parseInt(e.target.value) || 0 })
-                      }
-                      className="price-input"
-                      min="0"
-                    />
-                    <span>to</span>
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      value={priceRange.max}
-                      onChange={(e) =>
-                        setPriceRange({ ...priceRange, max: parseInt(e.target.value) || 10000 })
-                      }
-                      className="price-input"
-                      min="0"
-                    />
-                  </div>
-                  <input
-                    type="range"
-                    id="price-range"
-                    min="0"
-                    max="10000"
-                    step="100"
-                    value={priceRange.max}
-                    onChange={(e) =>
-                      setPriceRange({ ...priceRange, max: parseInt(e.target.value) })
-                    }
-                    className="price-slider"
-                  />
-                </div>
-
-                <button className="btn-clear-filters" onClick={clearFilters}>
-                  Clear All Filters
-                </button>
-              </div>
-            </div>
-
-            {showFilters && (
-              <div
-                className="filters-overlay"
-                onClick={() => setShowFilters(false)}
-              />
-            )}
-          </div>
-
-          {totalFilteredProducts === 0 ? (
+          {products.length === 0 ? (
             <div className="no-products">
               <div className="no-products-icon">🔍</div>
               <h3>No products found</h3>
-              <p>Try adjusting your search or filters</p>
-              <button className="btn-primary" onClick={clearFilters}>
-                Clear Filters
-              </button>
+              <p>Check back later for new products</p>
             </div>
           ) : (
-            <>
-              <div className="products-grid">
-                {paginatedProducts.map((product) => (
-                  <ProductCardUser
-                    key={product.id}
-                    product={product}
-                    onProductClick={(productId) => {
-                      setSelectedProductId(productId);
-                      setShowDetailsModal(true);
-                    }}
-                    onAddToCart={addToCart}
-                    onViewDetails={(productId) => navigate(`/products/${productId}`)}
-                  />
-                ))}
-              </div>
-
-              {totalPagesForFiltered > 1 && (
-                <div className="pagination-container">
-                  <button
-                    className="pagination-btn pagination-prev"
-                    onClick={() => {
-                      setCurrentPage((prev) => prev - 1);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    disabled={currentPage === 1}
-                  >
-                    ← Previous
-                  </button>
-
-                  <div className="pagination-numbers">
-                    {Array.from({ length: totalPagesForFiltered }, (_, i) => i + 1).map((pageNum) => {
-                      if (
-                        pageNum === 1 ||
-                        pageNum === totalPagesForFiltered ||
-                        (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                      ) {
-                        return (
-                          <button
-                            key={pageNum}
-                            className={`pagination-btn pagination-number ${pageNum === currentPage ? "active" : ""
-                              }`}
-                            onClick={() => {
-                              setCurrentPage(pageNum);
-                              window.scrollTo({ top: 0, behavior: "smooth" });
-                            }}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      } else if (
-                        pageNum === currentPage - 2 ||
-                        pageNum === currentPage + 2
-                      ) {
-                        return (
-                          <span key={pageNum} className="pagination-ellipsis">
-                            ...
-                          </span>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-
-                  <button
-                    className="pagination-btn pagination-next"
-                    onClick={() => {
-                      setCurrentPage((prev) => prev + 1);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    disabled={currentPage === totalPagesForFiltered}
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
-            </>
+            <div className="products-grid">
+              {products.map((product) => (
+                <ProductCardUser
+                  key={product.id}
+                  product={product}
+                  onProductClick={(productId) => {
+                    setSelectedProductId(productId);
+                    setShowDetailsModal(true);
+                  }}
+                  onAddToCart={addToCart}
+                  onViewDetails={(productId) => navigate(`/products/${productId}`)}
+                />
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -629,15 +346,32 @@ export default function UserProducts({ defaultTab = "products" }) {
                       <div className="items-summary">
                         {order.items.map((item) => (
                           <div key={item.id} className="item-summary">
-                            <span className="item-name">
-                              {item.product?.name || "Unknown Product"}
-                            </span>
-                            <span className="item-qty">
-                              Qty: <strong>{item.quantity}</strong>
-                            </span>
-                            <span className="item-price">
-                              ₹{item.product?.price * item.quantity || 0}
-                            </span>
+                            <img
+                              src={item.product?.imageUrl}
+                              alt={item.product?.name || "Product"}
+                              className="item-image"
+                              style={{
+                                width: '80px',
+                                height: '80px',
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                border: '1px solid #e5e7eb',
+                                flexShrink: 0
+                              }}
+                            />
+                            <div className="item-details">
+                              <span className="item-name">
+                                {item.product?.name || "Unknown Product"}
+                              </span>
+                              <div className="item-meta">
+                                <span className="item-qty">
+                                  Qty: <strong>{item.quantity}</strong>
+                                </span>
+                                <span className="item-price">
+                                  ₹{item.product?.price * item.quantity || 0}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>

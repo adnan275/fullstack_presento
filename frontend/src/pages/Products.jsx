@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import AddProductForm from "../components/AddProductForm";
@@ -65,6 +65,23 @@ export default function Products() {
       </div>
     );
   }
+
+  const handleOrderClick = useCallback(async (productId, quantity) => {
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+      await api.post(
+        "/orders",
+        { userId: user.id, items: [{ productId, quantity }] },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Order placed successfully!");
+      const response = await fetchProducts(1, 1000);
+      setProducts(response.products || response);
+    } catch (err) {
+      alert("Failed to place order: " + (err.response?.data?.error || err.message));
+    }
+  }, [fetchProducts]);
 
   return (
     <div className="products-page">
@@ -140,22 +157,7 @@ export default function Products() {
                 product={p}
                 isAdmin={isAdmin}
                 loading={loading}
-                onOrderClick={async (productId, quantity) => {
-                  try {
-                    const token = localStorage.getItem("token");
-                    const user = JSON.parse(localStorage.getItem("user"));
-                    await api.post(
-                      "/orders",
-                      { userId: user.id, items: [{ productId, quantity }] },
-                      { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    alert("Order placed successfully!");
-                    const response = await fetchProducts(1, 1000);
-                    setProducts(response.products || response);
-                  } catch (err) {
-                    alert("Failed to place order: " + (err.response?.data?.error || err.message));
-                  }
-                }}
+                onOrderClick={handleOrderClick}
                 onProductDeleted={handleProductDeleted}
                 onStockUpdated={handleStockUpdated}
               />

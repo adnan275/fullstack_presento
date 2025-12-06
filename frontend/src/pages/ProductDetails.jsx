@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import api from "../utils/api";
@@ -30,15 +30,7 @@ export default function ProductDetails() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  useEffect(() => {
-    fetchProduct();
-    fetchReviews();
-    if (token) {
-      checkReviewEligibility();
-    }
-  }, [id, token]);
-
-  async function fetchProduct() {
+  const fetchProduct = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -50,9 +42,9 @@ export default function ProductDetails() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [id]);
 
-  async function fetchReviews() {
+  const fetchReviews = useCallback(async () => {
     try {
       const { data } = await axios.get(`http://localhost:4000/api/reviews/product/${id}`);
       setReviews(data.reviews);
@@ -61,9 +53,9 @@ export default function ProductDetails() {
     } catch (err) {
       console.error("Error fetching reviews:", err);
     }
-  }
+  }, [id]);
 
-  async function checkReviewEligibility() {
+  const checkReviewEligibility = useCallback(async () => {
     try {
       const { data } = await axios.get(`http://localhost:4000/api/reviews/can-review/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -77,7 +69,15 @@ export default function ProductDetails() {
     } catch (err) {
       console.error("Error checking review eligibility:", err);
     }
-  }
+  }, [id, token, reviews]);
+
+  useEffect(() => {
+    fetchProduct();
+    fetchReviews();
+    if (token) {
+      checkReviewEligibility();
+    }
+  }, [fetchProduct, fetchReviews, checkReviewEligibility, token]);
 
   const handleSubmitReview = async (formData) => {
     try {
@@ -178,7 +178,7 @@ export default function ProductDetails() {
       </button>
 
       <div className="product-details-card">
-        <img src={product.imageUrl} alt={product.name} />
+        <img src={product.imageUrl} alt={product.name} loading="lazy" />
         <div className="product-details-info">
           <p className="product-details-tag">{product.category}</p>
           <h1>{product.name}</h1>

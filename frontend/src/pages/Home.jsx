@@ -4,6 +4,16 @@ import api from "../utils/api";
 import FAQ from "../components/FAQ";
 import "../styles/Home.css";
 
+const getBadgeClass = (badgeText) => {
+  if (!badgeText) return "";
+  if (badgeText === "Best Seller") return "";
+  if (badgeText === "New Arrival") return "new";
+  if (badgeText === "Popular") return "popular";
+  if (badgeText === "Limited Edition") return "limited";
+  if (badgeText === "Trending") return "trending";
+  return "";
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const [trendingProducts, setTrendingProducts] = useState([]);
@@ -41,15 +51,7 @@ export default function Home() {
     navigate(`/products/${productId}`);
   };
 
-  const getBadgeClass = (badgeText) => {
-    if (!badgeText) return "";
-    if (badgeText === "Best Seller") return "";
-    if (badgeText === "New Arrival") return "new";
-    if (badgeText === "Popular") return "popular";
-    if (badgeText === "Limited Edition") return "limited";
-    if (badgeText === "Trending") return "trending";
-    return "";
-  };
+
 
   return (
     <div className="home-page">
@@ -105,7 +107,7 @@ export default function Home() {
                       style={{ cursor: "pointer" }}
                     >
                       <div className="trending-image-wrapper">
-                        <img src={product.imageUrl} alt={product.name} />
+                        <img src={product.imageUrl} alt={product.name} loading="lazy" />
                         {product.badge && <span className={`trending-badge ${badgeClass}`}>{product.badge}</span>}
                       </div>
                       <div className="trending-info">

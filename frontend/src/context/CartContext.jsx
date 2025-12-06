@@ -83,7 +83,7 @@ export function CartProvider({ children }) {
   };
 
   const { cartCount, cartTotal, selectedItems } = useMemo(() => {
-    
+
     const normalizedItems = items.map(item => ({
       ...item,
       selected: item.selected !== undefined ? item.selected : true
@@ -97,7 +97,7 @@ export function CartProvider({ children }) {
   }, [items]);
 
   const value = {
-    items: items.map(item => ({ ...item, selected: item.selected !== undefined ? item.selected : true })),
+    items,
     addToCart,
     removeFromCart,
     updateQuantity,

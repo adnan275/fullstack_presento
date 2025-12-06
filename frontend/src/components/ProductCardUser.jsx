@@ -1,7 +1,8 @@
+import React from "react";
 import { useCart } from "../context/CartContext.jsx";
 import "../styles/ProductCardUser.css";
 
-export default function ProductCardUser({
+function ProductCardUser({
   product,
   onProductClick = () => { },
   onAddToCart = () => { },
@@ -39,7 +40,12 @@ export default function ProductCardUser({
         className="product-image-wrapper"
         onClick={() => onProductClick(product.id)}
       >
-        <img src={product.imageUrl} alt={product.name} className="product-image" />
+        <img
+          src={product.imageUrl}
+          alt={product.name}
+          className="product-image"
+          loading="lazy"
+        />
         <div
           className={`product-badge ${product.stock > 0 ? "in-stock" : "out-of-stock"
             }`}
@@ -99,3 +105,6 @@ export default function ProductCardUser({
     </div>
   );
 }
+
+export default React.memo(ProductCardUser);
+

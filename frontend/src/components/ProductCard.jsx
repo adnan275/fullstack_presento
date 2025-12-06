@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import api from "../utils/api";
 import "../styles/ProductCard.css";
 
-export default function ProductCard({ product, onOrderClick, loading, isAdmin, onProductDeleted, onStockUpdated }) {
+function ProductCard({ product, onOrderClick, loading, isAdmin, onProductDeleted, onStockUpdated }) {
   const [quantity, setQuantity] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -101,6 +101,7 @@ export default function ProductCard({ product, onOrderClick, loading, isAdmin, o
           src={product.imageUrl}
           alt={product.name}
           className="product-image"
+          loading="lazy"
         />
         <div className={`product-badge ${isOutOfStock ? "out-of-stock" : "in-stock"}`}>
           {isOutOfStock ? "Out of Stock" : "In Stock"}
@@ -217,3 +218,6 @@ export default function ProductCard({ product, onOrderClick, loading, isAdmin, o
     </div>
   );
 }
+
+export default React.memo(ProductCard);
+

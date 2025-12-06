@@ -1,6 +1,8 @@
 import express from 'express';
 import prisma from '../prisma/client.js';
 import authenticateToken from '../middleware/authMiddleware.js';
+import reviewMediaUpload from '../utils/reviewMediaUpload.js';
+import cloudinary from '../utils/cloudinary.js';
 
 const router = express.Router();
 
@@ -58,14 +60,19 @@ router.get('/product/:productId', async (req, res) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        const avgRating = reviews.length > 0
-            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        const reviewsWithParsedPhotos = reviews.map(review => ({
+            ...review,
+            photos: review.photos ? JSON.parse(review.photos) : []
+        }));
+
+        const avgRating = reviewsWithParsedPhotos.length > 0
+            ? reviewsWithParsedPhotos.reduce((sum, r) => sum + r.rating, 0) / reviewsWithParsedPhotos.length
             : 0;
 
         res.json({
-            reviews,
+            reviews: reviewsWithParsedPhotos,
             averageRating: avgRating,
-            totalReviews: reviews.length
+            totalReviews: reviewsWithParsedPhotos.length
         });
     } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -91,14 +98,22 @@ router.get('/user', authenticateToken, async (req, res) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        res.json(reviews);
+        const reviewsWithParsedPhotos = reviews.map(review => ({
+            ...review,
+            photos: review.photos ? JSON.parse(review.photos) : []
+        }));
+
+        res.json(reviewsWithParsedPhotos);
     } catch (error) {
         console.error('Error fetching user reviews:', error);
         res.status(500).json({ error: 'Failed to fetch user reviews' });
     }
 });
 
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, reviewMediaUpload.fields([
+    { name: 'photos', maxCount: 5 },
+    { name: 'video', maxCount: 1 }
+]), async (req, res) => {
     try {
         const { productId, rating, comment } = req.body;
         const userId = req.user.userId;
@@ -123,12 +138,72 @@ router.post('/', authenticateToken, async (req, res) => {
             return res.status(403).json({ error: 'You can only review products from delivered orders' });
         }
 
+        let photoUrls = [];
+        let videoUrl = null;
+
+        if (req.files?.photos) {
+            const photoUploadPromises = req.files.photos.map(file => {
+                return new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: "presento_reviews/photos",
+                            resource_type: "image",
+                            transformation: [
+                                { width: 1200, height: 1200, crop: "limit" },
+                                { quality: "auto" }
+                            ]
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result.secure_url);
+                        }
+                    );
+                    stream.end(file.buffer);
+                });
+            });
+
+            try {
+                photoUrls = await Promise.all(photoUploadPromises);
+            } catch (uploadError) {
+                console.error('Photo upload error:', uploadError);
+                return res.status(500).json({ error: 'Failed to upload photos' });
+            }
+        }
+
+        if (req.files?.video && req.files.video[0]) {
+            try {
+                const result = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: "presento_reviews/videos",
+                            resource_type: "video",
+                            transformation: [
+                                { duration: "0-20" },
+                                { quality: "auto" }
+                            ]
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    stream.end(req.files.video[0].buffer);
+                });
+                videoUrl = result.secure_url;
+            } catch (uploadError) {
+                console.error('Video upload error:', uploadError);
+                return res.status(500).json({ error: 'Failed to upload video' });
+            }
+        }
+
         const review = await prisma.review.create({
             data: {
                 userId,
                 productId: parseInt(productId),
                 rating: parseInt(rating),
-                comment: comment || null
+                comment: comment || null,
+                photos: photoUrls.length > 0 ? JSON.stringify(photoUrls) : null,
+                video: videoUrl
             },
             include: {
                 user: {
@@ -140,7 +215,12 @@ router.post('/', authenticateToken, async (req, res) => {
             }
         });
 
-        res.status(201).json(review);
+        const reviewResponse = {
+            ...review,
+            photos: review.photos ? JSON.parse(review.photos) : []
+        };
+
+        res.status(201).json(reviewResponse);
     } catch (error) {
         if (error.code === 'P2002') {
             return res.status(400).json({ error: 'You have already reviewed this product' });
@@ -150,10 +230,13 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, reviewMediaUpload.fields([
+    { name: 'photos', maxCount: 5 },
+    { name: 'video', maxCount: 1 }
+]), async (req, res) => {
     try {
         const reviewId = parseInt(req.params.id);
-        const { rating, comment } = req.body;
+        const { rating, comment, removePhotos, removeVideo } = req.body;
         const userId = req.user.userId;
 
         if (rating && (rating < 1 || rating > 5)) {
@@ -168,11 +251,80 @@ router.put('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Review not found or unauthorized' });
         }
 
+        let photoUrls = existingReview.photos ? JSON.parse(existingReview.photos) : [];
+        let videoUrl = existingReview.video;
+
+        if (removePhotos === 'true') {
+            photoUrls = [];
+        }
+
+        if (removeVideo === 'true') {
+            videoUrl = null;
+        }
+
+        if (req.files?.photos) {
+            const newPhotoUploadPromises = req.files.photos.map(file => {
+                return new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: "presento_reviews/photos",
+                            resource_type: "image",
+                            transformation: [
+                                { width: 1200, height: 1200, crop: "limit" },
+                                { quality: "auto" }
+                            ]
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result.secure_url);
+                        }
+                    );
+                    stream.end(file.buffer);
+                });
+            });
+
+            try {
+                const newPhotoUrls = await Promise.all(newPhotoUploadPromises);
+                photoUrls = [...photoUrls, ...newPhotoUrls];
+            } catch (uploadError) {
+                console.error('Photo upload error:', uploadError);
+                return res.status(500).json({ error: 'Failed to upload photos' });
+            }
+        }
+
+        if (req.files?.video && req.files.video[0]) {
+            try {
+                const result = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: "presento_reviews/videos",
+                            resource_type: "video",
+                            transformation: [
+                                { duration: "0-20" },
+                                { quality: "auto" }
+                            ]
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    stream.end(req.files.video[0].buffer);
+                });
+                videoUrl = result.secure_url;
+            } catch (uploadError) {
+                console.error('Video upload error:', uploadError);
+                return res.status(500).json({ error: 'Failed to upload video' });
+            }
+        }
+
         const updatedReview = await prisma.review.update({
             where: { id: reviewId },
             data: {
                 ...(rating && { rating: parseInt(rating) }),
-                ...(comment !== undefined && { comment: comment || null })
+                ...(comment !== undefined && { comment: comment || null }),
+                photos: photoUrls.length > 0 ? JSON.stringify(photoUrls) : null,
+                video: videoUrl
             },
             include: {
                 user: {
@@ -184,7 +336,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
             }
         });
 
-        res.json(updatedReview);
+        const reviewResponse = {
+            ...updatedReview,
+            photos: updatedReview.photos ? JSON.parse(updatedReview.photos) : []
+        };
+
+        res.json(reviewResponse);
     } catch (error) {
         console.error('Error updating review:', error);
         res.status(500).json({ error: 'Failed to update review' });

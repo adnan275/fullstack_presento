@@ -76,6 +76,8 @@ model Review {
   productId Int
   rating    Int
   comment   String?  @db.Text
+  photos    String?  @db.Text
+  video     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

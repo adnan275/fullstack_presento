@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import FAQ from "../components/FAQ";
 import "../styles/Home.css";
 
 export default function Home() {
@@ -52,7 +53,6 @@ export default function Home() {
 
   return (
     <div className="home-page">
-      { }
       <section className="home-hero">
         <div className="home-hero__content">
           <p className="home-pill">Presento Treasure</p>
@@ -83,7 +83,6 @@ export default function Home() {
         </div>
       </section>
 
-      { }
       <section className="trending-section">
         <div className="trending-container">
           <div className="trending-header">
@@ -129,7 +128,6 @@ export default function Home() {
         </div>
       </section>
 
-      { }
       <section className="home-section home-card--about">
         <h2>About Us !</h2>
         <p>
@@ -138,14 +136,12 @@ export default function Home() {
         </p>
       </section>
 
-      { }
       <section className="home-section home-card--occasions">
         <h2>For Every Occasion</h2>
         <p>Weddings | Birthdays | Anniversaries | Festive Moments</p>
         <span>We make celebrations unforgettable!</span>
       </section>
 
-      { }
       <section className="home-section home-card--offerings">
         <h2>What We Offer</h2>
         <div className="home-offerings-grid">
@@ -158,7 +154,6 @@ export default function Home() {
         </div>
       </section>
 
-      { }
       <section className="home-why">
         <h2>Why Choose Presento Treasure?</h2>
         <div className="home-why__grid">
@@ -171,7 +166,6 @@ export default function Home() {
         </div>
       </section>
 
-      { }
       <section className="home-section home-card--cta">
         <h2>Let Presento Treasure be part of your next celebration!</h2>
         <p>DM us for orders | Follow for ideas</p>
@@ -184,6 +178,8 @@ export default function Home() {
           Follow us on Instagram
         </a>
       </section>
+
+      <FAQ />
     </div>
   );
 }

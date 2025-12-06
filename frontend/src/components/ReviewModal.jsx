@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import StarRating from './StarRating';
+import MediaUploader from './MediaUploader';
 import './ReviewModal.css';
 
 export default function ReviewModal({ productId, productName, existingReview, onClose, onSubmit }) {
     const [rating, setRating] = useState(existingReview?.rating || 0);
     const [comment, setComment] = useState(existingReview?.comment || '');
+    const [photos, setPhotos] = useState([]);
+    const [video, setVideo] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,12 +22,32 @@ export default function ReviewModal({ productId, productName, existingReview, on
 
         setSubmitting(true);
         setError('');
+        setUploadProgress(0);
 
         try {
-            await onSubmit({ productId, rating, comment });
-            onClose();
+            const formData = new FormData();
+            formData.append('productId', productId);
+            formData.append('rating', rating);
+            formData.append('comment', comment);
+
+            photos.forEach((photo) => {
+                formData.append('photos', photo);
+            });
+
+            if (video) {
+                formData.append('video', video);
+            }
+
+            setUploadProgress(50);
+            await onSubmit(formData);
+            setUploadProgress(100);
+
+            setTimeout(() => {
+                onClose();
+            }, 500);
         } catch (err) {
             setError(err.response?.data?.error || 'Failed to submit review');
+            setUploadProgress(0);
         } finally {
             setSubmitting(false);
         }
@@ -72,6 +96,21 @@ export default function ReviewModal({ productId, productName, existingReview, on
                         />
                         <span className="char-count">{comment.length}/1000</span>
                     </div>
+
+                    <MediaUploader
+                        photos={photos}
+                        setPhotos={setPhotos}
+                        video={video}
+                        setVideo={setVideo}
+                        uploading={submitting}
+                    />
+
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                        <div className="upload-progress">
+                            <div className="upload-progress-bar" style={{ width: `${uploadProgress}%` }}></div>
+                            <span className="upload-progress-text">Uploading... {uploadProgress}%</span>
+                        </div>
+                    )}
 
                     {error && <div className="review-modal-error">{error}</div>}
 

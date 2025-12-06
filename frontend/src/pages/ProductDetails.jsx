@@ -25,6 +25,7 @@ export default function ProductDetails() {
   const [error, setError] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -78,24 +79,40 @@ export default function ProductDetails() {
     }
   }
 
-  const handleSubmitReview = async (reviewData) => {
+  const handleSubmitReview = async (formData) => {
     try {
       if (existingReview) {
         await axios.put(
           `http://localhost:4000/api/reviews/${existingReview.id}`,
-          reviewData,
-          { headers: { Authorization: `Bearer ${token}` } }
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
         );
       } else {
         await axios.post(
           'http://localhost:4000/api/reviews',
-          reviewData,
-          { headers: { Authorization: `Bearer ${token}` } }
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
         );
       }
-      fetchReviews();
-      checkReviewEligibility();
+
+      await fetchReviews();
+      await checkReviewEligibility();
       setShowReviewModal(false);
+      setShowSuccessMessage(true);
+
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 3000);
     } catch (err) {
       throw err;
     }
@@ -236,7 +253,6 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      { }
       <div className="product-reviews-section">
         <div className="reviews-header">
           <h2>Customer Reviews</h2>
@@ -249,6 +265,12 @@ export default function ProductDetails() {
             </button>
           )}
         </div>
+
+        {showSuccessMessage && (
+          <div className="review-success-message">
+            ✓ Review submitted successfully! Thank you for your feedback.
+          </div>
+        )}
 
         <ReviewList
           reviews={reviews}

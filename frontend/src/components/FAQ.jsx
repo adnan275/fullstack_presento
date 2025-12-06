@@ -7,7 +7,7 @@ export default function FAQ() {
     const faqs = [
         {
             question: "How to place an order?",
-            answer: "Browse our products, select the items you love, add them to your cart, and proceed to checkout. Fill in your delivery details and choose your preferred payment method to complete your order."
+            answer: "Browse our products, select the items you love, add them to your cart, and proceed to checkout. Fill in your delivery details and complete your order securely using our UPI QR Scanner."
         },
         {
             question: "How long does delivery take?",
@@ -19,7 +19,7 @@ export default function FAQ() {
         },
         {
             question: "Do you offer customization?",
-            answer: "Yes! We offer personalization options for many of our products. Look for the 'Customize' option on product pages, or contact our support team for special requests."
+            answer: "Yes! We offer personalization options for many of our products. Contact our support team for special requests."
         },
         {
             question: "What payment options are available?",

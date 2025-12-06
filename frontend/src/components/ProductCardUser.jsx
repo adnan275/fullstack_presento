@@ -1,15 +1,36 @@
+import { useCart } from "../context/CartContext.jsx";
 import "../styles/ProductCardUser.css";
 
 export default function ProductCardUser({
   product,
-  onProductClick = () => {},
-  onAddToCart = () => {},
-  onViewDetails = () => {},
+  onProductClick = () => { },
+  onAddToCart = () => { },
+  onViewDetails = () => { },
 }) {
+  const { items, updateQuantity, removeFromCart } = useCart();
+
+  const cartItem = items.find(item => item.id === product.id);
+
   const shortDescription =
     product.description?.length > 90
       ? `${product.description.slice(0, 87)}…`
       : product.description || "Pastel-perfect keepsakes for heartfelt gifting.";
+
+  const handleIncrement = () => {
+    if (cartItem && cartItem.quantity < product.stock) {
+      updateQuantity(product.id, cartItem.quantity + 1);
+    }
+  };
+
+  const handleDecrement = () => {
+    if (cartItem) {
+      if (cartItem.quantity > 1) {
+        updateQuantity(product.id, cartItem.quantity - 1);
+      } else {
+        removeFromCart(product.id);
+      }
+    }
+  };
 
   return (
     <div className="product-card-user">
@@ -20,9 +41,8 @@ export default function ProductCardUser({
       >
         <img src={product.imageUrl} alt={product.name} className="product-image" />
         <div
-          className={`product-badge ${
-            product.stock > 0 ? "in-stock" : "out-of-stock"
-          }`}
+          className={`product-badge ${product.stock > 0 ? "in-stock" : "out-of-stock"
+            }`}
         >
           {product.stock > 0 ? "In Stock" : "Sold Out"}
         </div>
@@ -46,14 +66,34 @@ export default function ProductCardUser({
           >
             View Details
           </button>
-          <button
-            type="button"
-            className="btn-solid"
-            disabled={product.stock === 0}
-            onClick={() => onAddToCart(product)}
-          >
-            Add to Cart
-          </button>
+
+          {cartItem ? (
+            <div className="quantity-selector-inline">
+              <button
+                className="quantity-btn-inline"
+                onClick={handleDecrement}
+              >
+                −
+              </button>
+              <span className="quantity-value-inline">{cartItem.quantity}</span>
+              <button
+                className="quantity-btn-inline"
+                onClick={handleIncrement}
+                disabled={cartItem.quantity >= product.stock}
+              >
+                +
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="btn-solid"
+              disabled={product.stock === 0}
+              onClick={() => onAddToCart(product)}
+            >
+              Add to Cart
+            </button>
+          )}
         </div>
       </div>
     </div>

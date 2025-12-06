@@ -23,6 +23,8 @@ export default function ProductDetails() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -118,6 +120,25 @@ export default function ProductDetails() {
     }
   };
 
+  const handleQuantityChange = (delta) => {
+    setQuantity(prev => {
+      const newQty = prev + delta;
+      if (newQty < 1) return 1;
+      if (newQty > product.stock) return product.stock;
+      return newQty;
+    });
+  };
+
+  const handleBuyNow = () => {
+    if (!token) {
+      navigate("/login", { state: { from: location } });
+      return;
+    }
+
+    addToCart({ ...product, quantity });
+    navigate("/checkout");
+  };
+
   if (loading) {
     return <div className="product-details-page">Loading product…</div>;
   }
@@ -156,30 +177,66 @@ export default function ProductDetails() {
 
           <p className="product-details-price">₹{product.price}</p>
           <p className="product-details-desc">{product.description}</p>
+
+          <div className="quantity-selector">
+            <label>Quantity:</label>
+            <div className="quantity-controls">
+              <button
+                className="quantity-btn"
+                onClick={() => handleQuantityChange(-1)}
+                disabled={quantity <= 1}
+              >
+                −
+              </button>
+              <span className="quantity-value">{quantity}</span>
+              <button
+                className="quantity-btn"
+                onClick={() => handleQuantityChange(1)}
+                disabled={quantity >= product.stock}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
           <div className="product-details-actions">
+            {!addedToCart ? (
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  const token = localStorage.getItem("token");
+                  if (!token) {
+                    navigate("/login", { state: { from: location } });
+                  } else {
+                    addToCart({ ...product, quantity });
+                    setAddedToCart(true);
+                  }
+                }}
+                disabled={product.stock === 0}
+              >
+                {product.stock === 0 ? "Sold Out" : "Add to Cart"}
+              </button>
+            ) : (
+              <button
+                className="btn-primary"
+                onClick={() => navigate("/cart")}
+              >
+                Go to Cart
+              </button>
+            )}
             <button
               className="btn-primary"
-              onClick={() => {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                  navigate("/login", { state: { from: location } });
-                } else {
-                  addToCart(product);
-                }
-              }}
+              onClick={handleBuyNow}
               disabled={product.stock === 0}
             >
-              {product.stock === 0 ? "Sold Out" : "Add to Cart"}
-            </button>
-            <button className="btn-ghost" onClick={() => navigate("/cart")}>
-              Go to Cart
+              Buy Now
             </button>
           </div>
           <small>Stock available: {product.stock} units</small>
         </div>
       </div>
 
-      {}
+      { }
       <div className="product-reviews-section">
         <div className="reviews-header">
           <h2>Customer Reviews</h2>

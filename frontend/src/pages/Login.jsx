@@ -15,30 +15,52 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log('🔐 Login attempt started');
+    console.log('📧 Email:', formData.email);
 
     try {
+      console.log('📡 Calling login API...');
       const res = await login(formData);
-      console.log('Login response:', res.data);
+      console.log('✅ Login response received:', res.data);
 
+      console.log('💾 Storing token in localStorage...');
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
+      console.log('✅ Token stored:', res.data.token.substring(0, 20) + '...');
 
       const ADMIN_EMAIL = 'ii@gmail.com';
       const ADMIN_PASSWORD = '12345';
       const isAdmin = formData.email === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD;
+
+      console.log('👤 Admin check:', {
+        email: formData.email,
+        expectedEmail: ADMIN_EMAIL,
+        emailMatch: formData.email === ADMIN_EMAIL,
+        passwordMatch: formData.password === ADMIN_PASSWORD,
+        isAdmin: isAdmin
+      });
+
       localStorage.setItem('isAdmin', isAdmin);
+      console.log('💾 isAdmin flag stored:', isAdmin);
 
       if (isAdmin) {
+        console.log('🎯 Navigating to admin dashboard...');
         navigate('/admin/products');
+        console.log('✅ Navigation to /admin/products triggered');
       } else {
+        console.log('🏠 Navigating to home page...');
         navigate('/');
+        console.log('✅ Navigation to / triggered');
       }
 
     } catch (err) {
-      console.error('Login error:', err.response?.data || err.message);
+      console.error('❌ Login error:', err);
+      console.error('❌ Error response:', err.response?.data);
+      console.error('❌ Error message:', err.message);
       alert(err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
+      console.log('🏁 Login process completed');
     }
   };
 

@@ -17,16 +17,25 @@ export default function Products() {
   const { fetchProducts } = useProducts();
 
   useEffect(() => {
+    console.log('🏢 Admin Products page mounted');
 
     const adminFlag = localStorage.getItem("isAdmin") === "true";
+    console.log('👤 Admin status check:', {
+      isAdminFromStorage: localStorage.getItem("isAdmin"),
+      parsedAsBoolean: adminFlag,
+      token: localStorage.getItem("token") ? 'Present' : 'Missing',
+      user: localStorage.getItem("user") ? 'Present' : 'Missing'
+    });
     setIsAdmin(adminFlag);
 
     async function load() {
       try {
+        console.log('📦 Fetching products...');
         const response = await fetchProducts(1, 1000);
+        console.log('✅ Products fetched:', response.products?.length || response.length, 'items');
         setProducts(response.products || response);
       } catch (err) {
-        console.error("Products fetch error:", err);
+        console.error("❌ Products fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -58,14 +67,6 @@ export default function Products() {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="products-container">
-        <div className="loading">Loading products...</div>
-      </div>
-    );
-  }
-
   const handleOrderClick = useCallback(async (productId, quantity) => {
     try {
       const token = localStorage.getItem("token");
@@ -82,6 +83,14 @@ export default function Products() {
       alert("Failed to place order: " + (err.response?.data?.error || err.message));
     }
   }, [fetchProducts]);
+
+  if (loading) {
+    return (
+      <div className="products-container">
+        <div className="loading">Loading products...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="products-page">

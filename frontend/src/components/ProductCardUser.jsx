@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext.jsx";
 import "../styles/ProductCardUser.css";
 
@@ -34,25 +35,40 @@ function ProductCardUser({
   };
 
   return (
-    <div className="product-card-user">
-      <button
+    <motion.div
+      className="product-card-user"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+    >
+      <motion.button
         type="button"
         className="product-image-wrapper"
         onClick={() => onProductClick(product.id)}
+        whileHover="hover"
+        initial="rest"
       >
-        <img
+        <motion.img
           src={product.imageUrl}
           alt={product.name}
           className="product-image"
           loading="lazy"
+          variants={{
+            rest: { scale: 1 },
+            hover: { scale: 1.1 }
+          }}
+          transition={{ duration: 0.4 }}
         />
-        <div
-          className={`product-badge ${product.stock > 0 ? "in-stock" : "out-of-stock"
-            }`}
+        <motion.div
+          className={`product-badge ${product.stock > 0 ? "in-stock" : "out-of-stock"}`}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
         >
           {product.stock > 0 ? "In Stock" : "Sold Out"}
-        </div>
-      </button>
+        </motion.div>
+      </motion.button>
 
       <div className="product-card-content">
         <h3 className="product-name">{product.name}</h3>
@@ -65,44 +81,65 @@ function ProductCardUser({
         </div>
 
         <div className="product-card-actions">
-          <button
+          <motion.button
             type="button"
             className="btn-outline"
             onClick={() => onViewDetails(product.id)}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
           >
             View Details
-          </button>
+          </motion.button>
 
           {cartItem ? (
-            <div className="quantity-selector-inline">
-              <button
+            <motion.div
+              className="quantity-selector-inline"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.button
                 className="quantity-btn-inline"
                 onClick={handleDecrement}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
                 −
-              </button>
-              <span className="quantity-value-inline">{cartItem.quantity}</span>
-              <button
+              </motion.button>
+              <motion.span
+                className="quantity-value-inline"
+                key={cartItem.quantity}
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {cartItem.quantity}
+              </motion.span>
+              <motion.button
                 className="quantity-btn-inline"
                 onClick={handleIncrement}
                 disabled={cartItem.quantity >= product.stock}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
                 +
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ) : (
-            <button
+            <motion.button
               type="button"
               className="btn-solid"
               disabled={product.stock === 0}
               onClick={() => onAddToCart(product)}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
               Add to Cart
-            </button>
+            </motion.button>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

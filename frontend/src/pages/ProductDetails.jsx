@@ -1,11 +1,21 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import api from "../utils/api";
 import { useCart } from "../context/CartContext.jsx";
 import StarRating from "../components/StarRating";
 import ReviewModal from "../components/ReviewModal";
 import ReviewList from "../components/ReviewList";
+import {
+  pageTransition,
+  slideUp,
+  slideInLeft,
+  slideInRight,
+  scaleIn,
+  notificationVariants,
+  imageZoom
+} from "../utils/animationVariants";
 import "../styles/ProductDetails.css";
 
 export default function ProductDetails() {
@@ -174,105 +184,229 @@ export default function ProductDetails() {
   }
 
   return (
-    <div className="product-details-page">
-      <button className="btn-ghost back-btn" onClick={() => navigate("/shop")}>
+    <motion.div
+      className="product-details-page"
+      variants={pageTransition}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
+      <motion.button
+        className="btn-ghost back-btn"
+        onClick={() => navigate("/shop")}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4 }}
+        whileHover={{ x: -5 }}
+        whileTap={{ scale: 0.95 }}
+      >
         ← Back to shop
-      </button>
+      </motion.button>
 
-      <div className="product-details-card">
-        <img src={product.imageUrl} alt={product.name} loading="lazy" />
-        <div className="product-details-info">
-          <p className="product-details-tag">{product.category}</p>
-          <h1>{product.name}</h1>
+      <motion.div
+        className="product-details-card"
+        variants={scaleIn}
+        initial="initial"
+        animate="animate"
+      >
+        <motion.img
+          src={product.imageUrl}
+          alt={product.name}
+          loading="lazy"
+          whileHover="hover"
+          initial="rest"
+          variants={imageZoom}
+          transition={{ duration: 0.4 }}
+        />
+        <motion.div
+          className="product-details-info"
+          variants={slideInRight}
+          initial="initial"
+          animate="animate"
+        >
+          <motion.p
+            className="product-details-tag"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            {product.category}
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            {product.name}
+          </motion.h1>
 
           {totalReviews > 0 && (
-            <div className="product-rating-summary">
+            <motion.div
+              className="product-rating-summary"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
               <StarRating rating={averageRating} size="medium" />
               <span className="rating-text">
                 {averageRating.toFixed(1)} ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
               </span>
-            </div>
+            </motion.div>
           )}
 
-          <p className="product-details-price">₹{product.price}</p>
-          <p className="product-details-desc">{product.description}</p>
+          <motion.p
+            className="product-details-price"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            ₹{product.price}
+          </motion.p>
+          <motion.p
+            className="product-details-desc"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            {product.description}
+          </motion.p>
 
-          <div className="quantity-selector">
+          <motion.div
+            className="quantity-selector"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
             <label>Quantity:</label>
             <div className="quantity-controls">
-              <button
+              <motion.button
                 className="quantity-btn"
                 onClick={() => handleQuantityChange(-1)}
                 disabled={quantity <= 1}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
                 −
-              </button>
-              <span className="quantity-value">{quantity}</span>
-              <button
+              </motion.button>
+              <motion.span
+                className="quantity-value"
+                key={quantity}
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                {quantity}
+              </motion.span>
+              <motion.button
                 className="quantity-btn"
                 onClick={() => handleQuantityChange(1)}
                 disabled={quantity >= product.stock}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
                 +
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="product-details-actions">
-            {!addedToCart ? (
-              <button
-                className="btn-primary"
-                onClick={() => {
-                  const token = localStorage.getItem("token");
-                  if (!token) {
-                    navigate("/login", { state: { from: location } });
-                  } else {
-                    addToCart({ ...product, quantity });
-                    setAddedToCart(true);
-                  }
-                }}
-                disabled={product.stock === 0}
-              >
-                {product.stock === 0 ? "Sold Out" : "Add to Cart"}
-              </button>
-            ) : (
-              <button
-                className="btn-primary"
-                onClick={() => navigate("/cart")}
-              >
-                Go to Cart
-              </button>
-            )}
-            <button
+          <motion.div
+            className="product-details-actions"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <AnimatePresence mode="wait">
+              {!addedToCart ? (
+                <motion.button
+                  key="add-to-cart"
+                  className="btn-primary"
+                  onClick={() => {
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      navigate("/login", { state: { from: location } });
+                    } else {
+                      addToCart({ ...product, quantity });
+                      setAddedToCart(true);
+                    }
+                  }}
+                  disabled={product.stock === 0}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {product.stock === 0 ? "Sold Out" : "Add to Cart"}
+                </motion.button>
+              ) : (
+                <motion.button
+                  key="go-to-cart"
+                  className="btn-primary"
+                  onClick={() => navigate("/cart")}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Go to Cart
+                </motion.button>
+              )}
+            </AnimatePresence>
+            <motion.button
               className="btn-primary"
               onClick={handleBuyNow}
               disabled={product.stock === 0}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
               Buy Now
-            </button>
-          </div>
-          <small>Stock available: {product.stock} units</small>
-        </div>
-      </div>
+            </motion.button>
+          </motion.div>
+          <motion.small
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+          >
+            Stock available: {product.stock} units
+          </motion.small>
+        </motion.div>
+      </motion.div>
 
-      <div className="product-reviews-section">
+      <motion.div
+        className="product-reviews-section"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="reviews-header">
           <h2>Customer Reviews</h2>
           {canReview && (
-            <button
+            <motion.button
               className="btn-secondary"
               onClick={() => setShowReviewModal(true)}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
               {hasReviewed ? 'Edit Your Review' : 'Write a Review'}
-            </button>
+            </motion.button>
           )}
         </div>
 
-        {showSuccessMessage && (
-          <div className="review-success-message">
-            ✓ Review submitted successfully! Thank you for your feedback.
-          </div>
-        )}
+        <AnimatePresence>
+          {showSuccessMessage && (
+            <motion.div
+              className="review-success-message"
+              variants={notificationVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              ✓ Review submitted successfully! Thank you for your feedback.
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <ReviewList
           reviews={reviews}
@@ -280,7 +414,7 @@ export default function ProductDetails() {
           onEdit={handleEditReview}
           onDelete={handleDeleteReview}
         />
-      </div>
+      </motion.div>
 
       {showReviewModal && (
         <ReviewModal
@@ -294,6 +428,6 @@ export default function ProductDetails() {
           onSubmit={handleSubmitReview}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

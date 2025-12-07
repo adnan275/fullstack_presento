@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import api from "../utils/api";
 import FAQ from "../components/FAQ";
+import {
+  slideUp,
+  slideInLeft,
+  slideInRight,
+  staggerContainer,
+  staggerItem,
+  cardHover,
+  floatingAnimation,
+  fadeIn
+} from "../utils/animationVariants";
 import "../styles/Home.css";
 
 const getBadgeClass = (badgeText) => {
@@ -54,25 +65,69 @@ export default function Home() {
 
 
   return (
-    <div className="home-page">
+    <motion.div
+      className="home-page"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
       <section className="home-hero">
-        <div className="home-hero__content">
-          <p className="home-pill">Presento Treasure</p>
-          <h1>Where every gift tells a story</h1>
-          <p className="home-hero__text">
+        <motion.div
+          className="home-hero__content"
+          variants={slideInLeft}
+        >
+          <motion.p
+            className="home-pill"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Presento Treasure
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            Where every gift tells a story
+          </motion.h1>
+          <motion.p
+            className="home-hero__text"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
             Personalized & thoughtful gifts for every occasion. Discover curated hampers,
             Nikah Namas, and keepsakes infused with pastel elegance.
-          </p>
-          <div className="home-hero__cta">
-            <button className="btn-primary" onClick={() => navigate("/shop")}>
+          </motion.p>
+          <motion.div
+            className="home-hero__cta"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          >
+            <motion.button
+              className="btn-primary"
+              onClick={() => navigate("/shop")}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Shop Now
-            </button>
-            <button className="btn-ghost" onClick={() => navigate("/contact")}>
+            </motion.button>
+            <motion.button
+              className="btn-ghost"
+              onClick={() => navigate("/contact")}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Talk to us
-            </button>
-          </div>
-        </div>
-        <div className="home-hero__visual">
+            </motion.button>
+          </motion.div>
+        </motion.div>
+        <motion.div
+          className="home-hero__visual"
+          variants={slideInRight}
+        >
           <div className="hero-card">
             <span className="hero-card__tag">Pastel Dreams</span>
             <h3>Custom Hampers</h3>
@@ -82,106 +137,242 @@ export default function Home() {
             <h3>Nikah Nama</h3>
             <p>Made-to-order artworks to celebrate sacred promises.</p>
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      <section className="trending-section">
+      <motion.section
+        className="trending-section"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="trending-container">
-          <div className="trending-header">
+          <motion.div
+            className="trending-header"
+            variants={slideUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+          >
             <h2>Trending Gifts This Season</h2>
             <p>Our most loved creations, curated just for you 💞</p>
-          </div>
+          </motion.div>
 
           {loading ? (
             <div className="trending-loading">Loading products...</div>
           ) : (
             <>
-              <div className="trending-grid">
-                {trendingProducts.map((product) => {
+              <motion.div
+                className="trending-grid"
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true, margin: "-50px" }}
+              >
+                {trendingProducts.map((product, index) => {
                   const badgeClass = getBadgeClass(product.badge);
                   return (
-                    <div
+                    <motion.div
                       key={product.id}
                       className="trending-card"
+                      variants={staggerItem}
+                      whileHover={{
+                        y: -8,
+                        scale: 1.02,
+                        transition: { duration: 0.3 }
+                      }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleProductClick(product.id)}
                       style={{ cursor: "pointer" }}
                     >
-                      <div className="trending-image-wrapper">
-                        <img src={product.imageUrl} alt={product.name} loading="lazy" />
-                        {product.badge && <span className={`trending-badge ${badgeClass}`}>{product.badge}</span>}
-                      </div>
+                      <motion.div
+                        className="trending-image-wrapper"
+                        whileHover="hover"
+                        initial="rest"
+                      >
+                        <motion.img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          loading="lazy"
+                          variants={{
+                            rest: { scale: 1 },
+                            hover: { scale: 1.1 }
+                          }}
+                          transition={{ duration: 0.4 }}
+                        />
+                        {product.badge && (
+                          <motion.span
+                            className={`trending-badge ${badgeClass}`}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: index * 0.1 + 0.3 }}
+                          >
+                            {product.badge}
+                          </motion.span>
+                        )}
+                      </motion.div>
                       <div className="trending-info">
                         <h3>{product.name}</h3>
                         <p className="trending-price">₹{product.price}</p>
                         <p className="trending-category">{product.category}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
-              </div>
+              </motion.div>
 
-              <div className="trending-view-all">
-                <button className="btn-secondary" onClick={() => navigate("/shop")}>
+              <motion.div
+                className="trending-view-all"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <motion.button
+                  className="btn-secondary"
+                  onClick={() => navigate("/shop")}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   View All Products →
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </>
           )}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="home-section home-card--about">
+      <motion.section
+        className="home-section home-card--about"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <h2>About Us !</h2>
         <p>
           A one-stop shop for personalized & thoughtful gifts because every occasion
           deserves something special.
         </p>
-      </section>
+      </motion.section>
 
-      <section className="home-section home-card--occasions">
+      <motion.section
+        className="home-section home-card--occasions"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <h2>For Every Occasion</h2>
         <p>Weddings | Birthdays | Anniversaries | Festive Moments</p>
         <span>We make celebrations unforgettable!</span>
-      </section>
+      </motion.section>
 
-      <section className="home-section home-card--offerings">
+      <motion.section
+        className="home-section home-card--offerings"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <h2>What We Offer</h2>
-        <div className="home-offerings-grid">
+        <motion.div
+          className="home-offerings-grid"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+        >
           {offerings.map((item) => (
-            <article key={item.title}>
+            <motion.article
+              key={item.title}
+              variants={staggerItem}
+              whileHover={{ scale: 1.05, y: -5 }}
+            >
               <span>{item.icon}</span>
               <p>{item.title}</p>
-            </article>
+            </motion.article>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="home-why">
-        <h2>Why Choose Presento Treasure?</h2>
-        <div className="home-why__grid">
+      <motion.section
+        className="home-why"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          Why Choose Presento Treasure?
+        </motion.h2>
+        <motion.div
+          className="home-why__grid"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+        >
           {reasons.map((card) => (
-            <div key={card.title} className="home-why__card">
+            <motion.div
+              key={card.title}
+              className="home-why__card"
+              variants={staggerItem}
+              whileHover={{ y: -5, scale: 1.02 }}
+            >
               <h3>{card.title}</h3>
               <p>{card.text}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="home-section home-card--cta">
-        <h2>Let Presento Treasure be part of your next celebration!</h2>
-        <p>DM us for orders | Follow for ideas</p>
-        <a
+      <motion.section
+        className="home-section home-card--cta"
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          Let Presento Treasure be part of your next celebration!
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          DM us for orders | Follow for ideas
+        </motion.p>
+        <motion.a
           href="https://www.instagram.com/presento_treasure?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
           target="_blank"
           rel="noreferrer"
           className="btn-instagram"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          whileHover={{ scale: 1.05, y: -3 }}
+          whileTap={{ scale: 0.95 }}
         >
           Follow us on Instagram
-        </a>
-      </section>
+        </motion.a>
+      </motion.section>
 
       <FAQ />
-    </div>
+    </motion.div>
   );
 }

@@ -128,14 +128,23 @@ function ProductCard({ product, onOrderClick, loading, isAdmin, onProductDeleted
         <div className="product-header">
           <h3 className="product-name">{product.name}</h3>
           {isAdmin && (
-            <button
-              onClick={handleDeleteProduct}
-              disabled={isDeleting}
-              className="btn-delete-product"
-              title="Delete product"
-            >
-              {isDeleting ? "..." : "🗑️"}
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => navigate(`/admin/products/edit/${product.id}`)}
+                className="btn-edit-product"
+                title="Edit product"
+              >
+                ✏️ Edit
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                disabled={isDeleting}
+                className="btn-delete-product"
+                title="Delete product"
+              >
+                {isDeleting ? "..." : "🗑️"}
+              </button>
+            </div>
           )}
         </div>
         <p className="product-description">{product.description}</p>

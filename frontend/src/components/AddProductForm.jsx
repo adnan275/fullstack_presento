@@ -6,10 +6,13 @@ export default function AddProductForm({ onProductAdded }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    shortDescription: "",
     price: "",
     stock: "",
-    category: "Electronics",
+    category: "Personalized",
     badge: "",
+    discount: "",
+    sku: "",
     isFeatured: false,
   });
   const [image, setImage] = useState(null);
@@ -24,6 +27,13 @@ export default function AddProductForm({ onProductAdded }) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const generateSKU = () => {
+    const lastSKU = localStorage.getItem('lastSKU') || '1000';
+    const nextSKU = (parseInt(lastSKU) + 1).toString();
+    localStorage.setItem('lastSKU', nextSKU);
+    setFormData((prev) => ({ ...prev, sku: nextSKU }));
   };
 
   const handleImageChange = (e) => {
@@ -70,11 +80,25 @@ export default function AddProductForm({ onProductAdded }) {
       const submitData = new FormData();
       submitData.append("name", formData.name);
       submitData.append("description", formData.description);
+      if (formData.shortDescription) {
+        submitData.append("shortDescription", formData.shortDescription);
+      }
       submitData.append("price", parseFloat(formData.price));
       submitData.append("stock", parseInt(formData.stock));
       submitData.append("category", formData.category);
       if (formData.badge) {
         submitData.append("badge", formData.badge);
+      }
+      if (formData.discount) {
+        submitData.append("discount", parseInt(formData.discount));
+      }
+      if (formData.sku) {
+        submitData.append("sku", formData.sku);
+      } else {
+        const lastSKU = localStorage.getItem('lastSKU') || '1000';
+        const nextSKU = (parseInt(lastSKU) + 1).toString();
+        localStorage.setItem('lastSKU', nextSKU);
+        submitData.append("sku", nextSKU);
       }
       submitData.append("isFeatured", formData.isFeatured);
       submitData.append("image", image);
@@ -91,10 +115,13 @@ export default function AddProductForm({ onProductAdded }) {
       setFormData({
         name: "",
         description: "",
+        shortDescription: "",
         price: "",
         stock: "",
-        category: "Electronics",
+        category: "Personalized",
         badge: "",
+        discount: "",
+        sku: "",
         isFeatured: false,
       });
       setImage(null);
@@ -147,18 +174,41 @@ export default function AddProductForm({ onProductAdded }) {
               onChange={handleInputChange}
               disabled={loading}
             >
-              <option value="Electronics">Electronics</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Books">Stationary</option>
-              <option value="Food & Beverages">Food & Beverages</option>
-              <option value="Home & Kitchen">Home & Kitchen</option>
-              <option value="Sports">Sports</option>
-              <option value="Other">Other</option>
+              <option value="Personalized">Personalized</option>
+              <option value="Hampers">Hampers</option>
+              <option value="Gifts for Her">Gifts for Her</option>
+              <option value="Gifts for Him">Gifts for Him</option>
+              <option value="Kids Gifts">Kids Gifts</option>
+              <option value="Couple Gifts">Couple Gifts</option>
+              <option value="Romantic">Romantic</option>
+              <option value="Birthday">Birthday</option>
+              <option value="Anniversary">Anniversary</option>
+              <option value="Home Decor">Home Decor</option>
+              <option value="Festive Gifts">Festive Gifts</option>
+              <option value="Luxury Gifts">Luxury Gifts</option>
+              <option value="Accessories">Accessories</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Description *</label>
+            <label htmlFor="shortDescription">Short Description (Optional)</label>
+            <textarea
+              id="shortDescription"
+              name="shortDescription"
+              placeholder="Brief product summary for cards (max 150 characters)..."
+              value={formData.shortDescription}
+              onChange={handleInputChange}
+              disabled={loading}
+              rows="2"
+              maxLength="150"
+            />
+            <small style={{ color: '#666', fontSize: '12px' }}>
+              {formData.shortDescription.length}/150 characters
+            </small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description">Full Description *</label>
             <textarea
               id="description"
               name="description"
@@ -181,11 +231,35 @@ export default function AddProductForm({ onProductAdded }) {
                 value={formData.price}
                 onChange={handleInputChange}
                 disabled={loading}
-                step="0.01"
-                min="0"
+                step="1"
+                min="299"
+                max="49999"
               />
             </div>
 
+            <div className="form-group">
+              <label htmlFor="discount">Discount % (Optional)</label>
+              <input
+                id="discount"
+                type="number"
+                name="discount"
+                placeholder="0"
+                value={formData.discount}
+                onChange={handleInputChange}
+                disabled={loading}
+                min="0"
+                max="100"
+                step="1"
+              />
+              {formData.price && formData.discount && (
+                <small style={{ color: '#2e7d32', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                  Final Price: ₹{Math.round(formData.price * (1 - formData.discount / 100))}
+                </small>
+              )}
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-group">
               <label htmlFor="stock">Stock Quantity *</label>
               <input
@@ -200,11 +274,36 @@ export default function AddProductForm({ onProductAdded }) {
                 step="1"
               />
             </div>
+
+            <div className="form-group">
+              <label htmlFor="sku">Order ID (Auto-generated)</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  id="sku"
+                  type="text"
+                  name="sku"
+                  placeholder="Auto-generated: 1001, 1002..."
+                  value={formData.sku}
+                  onChange={handleInputChange}
+                  disabled={loading}
+                  style={{ flex: 1 }}
+                  readOnly
+                />
+                <button
+                  type="button"
+                  onClick={generateSKU}
+                  disabled={loading}
+                  className="btn-generate-sku"
+                >
+                  Generate
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="badge">Badge (Optional)</label>
+              <label htmlFor="badge">Tag (Optional)</label>
               <select
                 id="badge"
                 name="badge"
@@ -212,12 +311,12 @@ export default function AddProductForm({ onProductAdded }) {
                 onChange={handleInputChange}
                 disabled={loading}
               >
-                <option value="">None</option>
+                <option value="">No Tag</option>
                 <option value="Best Seller">Best Seller</option>
-                <option value="New Arrival">New Arrival</option>
-                <option value="Popular">Popular</option>
                 <option value="Trending">Trending</option>
+                <option value="Popular">Popular</option>
                 <option value="Limited Edition">Limited Edition</option>
+                <option value="New Arrival">New Arrival</option>
               </select>
             </div>
 

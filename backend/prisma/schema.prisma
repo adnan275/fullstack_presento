@@ -34,18 +34,21 @@ model Address {
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String
-  price       Int
-  stock       Int
-  category    String
-  imageUrl    String
-  badge       String?
-  isFeatured  Boolean     @default(false)
-  orderItems  OrderItem[]
-  reviews     Review[]
-  createdAt   DateTime    @default(now())
+  id               Int         @id @default(autoincrement())
+  name             String
+  description      String      @db.Text
+  shortDescription String?
+  price            Int
+  discount         Int?
+  stock            Int
+  category         String
+  imageUrl         String
+  badge            String?
+  sku              String?
+  isFeatured       Boolean     @default(false)
+  orderItems       OrderItem[]
+  reviews          Review[]
+  createdAt        DateTime    @default(now())
 }
 
 model Order {

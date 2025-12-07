@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post("/", auth, upload.single("image"), async (req, res) => {
   try {
-    const { name, description, price, stock, category, badge, isFeatured } = req.body;
+    const { name, description, shortDescription, price, stock, category, badge, discount, sku, isFeatured } = req.body;
     let imageUrl = "";
 
     if (req.file) {
@@ -31,6 +31,10 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       }
     }
 
+    if (discount && (discount < 0 || discount > 100)) {
+      return res.status(400).json({ error: "Discount must be between 0 and 100" });
+    }
+
     const productData = {
       name,
       description,
@@ -40,6 +44,18 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       imageUrl,
       isFeatured: isFeatured === "true" || isFeatured === true,
     };
+
+    if (shortDescription) {
+      productData.shortDescription = shortDescription;
+    }
+
+    if (discount) {
+      productData.discount = Number(discount);
+    }
+
+    if (sku) {
+      productData.sku = sku;
+    }
 
     if (badge) {
       productData.badge = badge;
@@ -100,6 +116,71 @@ router.get("/:id", async (req, res) => {
     res.json(product);
   } catch (err) {
     console.error("Fetch product error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put("/:id", auth, upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, shortDescription, price, stock, category, badge, discount, sku, isFeatured } = req.body;
+
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    if (discount && (discount < 0 || discount > 100)) {
+      return res.status(400).json({ error: "Discount must be between 0 and 100" });
+    }
+
+    let imageUrl = existingProduct.imageUrl;
+
+    if (req.file) {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: "presento_products", resource_type: "auto" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+        imageUrl = result.secure_url;
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload error:", cloudinaryError);
+        return res.status(500).json({ error: "Image upload failed: " + cloudinaryError.message });
+      }
+    }
+
+    const updateData = {
+      name,
+      description,
+      shortDescription: shortDescription || null,
+      price: Number(price),
+      stock: Number(stock),
+      category,
+      imageUrl,
+      badge: badge || null,
+      discount: discount ? Number(discount) : null,
+      sku: sku || null,
+      isFeatured: isFeatured === "true" || isFeatured === true,
+    };
+
+    const updatedProduct = await prisma.product.update({
+      where: { id: parseInt(id) },
+      data: updateData,
+    });
+
+    console.log("✅ Product updated:", updatedProduct.name, "(ID:", id, ")");
+    res.json(updatedProduct);
+  } catch (err) {
+    console.error("Product update error:", err);
     res.status(500).json({ error: err.message });
   }
 });

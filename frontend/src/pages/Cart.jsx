@@ -3,7 +3,7 @@ import { useCart } from "../context/CartContext.jsx";
 import "../styles/Cart.css";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeFromCart, toggleItemSelection, cartTotal, selectedItems } = useCart();
+  const { items, updateQuantity, removeFromCart, toggleItemSelection, cartTotal, deliveryCharge, finalTotal, selectedItems } = useCart();
   const navigate = useNavigate();
 
   const handleBuyNow = () => {
@@ -103,12 +103,24 @@ export default function CartPage() {
                 <strong>₹{cartTotal.toFixed(2)}</strong>
               </div>
               <div className="cart-summary__row">
-                <span>Shipping</span>
-                <strong>Calculated at dispatch</strong>
+                <span>Delivery Charge</span>
+                <strong className={deliveryCharge === 0 ? "text-success" : ""}>
+                  {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
+                </strong>
               </div>
+              {deliveryCharge > 0 && cartTotal > 0 && (
+                <div className="cart-summary__note">
+                  <small>💡 Add ₹{(500 - cartTotal).toFixed(0)} more for FREE delivery!</small>
+                </div>
+              )}
+              {deliveryCharge === 0 && cartTotal > 0 && (
+                <div className="cart-summary__note cart-summary__note--success">
+                  <small>🎉 You got FREE delivery!</small>
+                </div>
+              )}
               <div className="cart-summary__row cart-summary__row--total">
                 <span>Grand Total</span>
-                <strong>₹{cartTotal.toFixed(2)}</strong>
+                <strong>₹{finalTotal.toFixed(2)}</strong>
               </div>
               <button
                 className="btn-primary cart-summary__cta"

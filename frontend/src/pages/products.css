@@ -35,8 +35,8 @@
 
 .header-content {
   max-width: var(--container-width);
-  margin: 0 auto;
-  padding: 2rem 2rem 0;
+  margin: 0 auto 0 calc(50% - var(--container-width) / 2 - 2rem);
+  padding: 2rem 2rem 0 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -535,10 +535,6 @@
     flex-direction: column;
     align-items: stretch;
     gap: 1.5rem;
-  }
-
-  .header-left {
-    text-align: center;
   }
 
   .header-actions {

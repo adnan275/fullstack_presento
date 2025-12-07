@@ -2,7 +2,7 @@
     padding: 2rem min(4vw, 2rem) 6rem;
     background: var(--gray-50);
     min-height: 100vh;
-    
+
     background-image:
         radial-gradient(circle at top left, rgba(251, 207, 232, 0.4), transparent 40%),
         linear-gradient(180deg, #fff1f2 0%, #fff 100%);
@@ -161,6 +161,35 @@
     color: var(--gray-900);
 }
 
+.checkout-note {
+    background: linear-gradient(135deg, #fef3f7 0%, #fce7f3 100%);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin: 12px 0;
+    border-left: 4px solid #ec4899;
+    text-align: center;
+}
+
+.checkout-note small {
+    color: #ec4899;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.checkout-note--success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border-left-color: #10b981;
+}
+
+.checkout-note--success small {
+    color: #065f46;
+}
+
+.text-success {
+    color: #10b981 !important;
+    font-weight: 700;
+}
+
 .checkout-form {
     display: flex;
     flex-direction: column;
@@ -249,8 +278,8 @@
 }
 
 .checkout-logo {
-  height: 60px;
-  width: auto;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0 4px 8px rgba(236, 72, 153, 0.15));
+    height: 60px;
+    width: auto;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 4px 8px rgba(236, 72, 153, 0.15));
 }

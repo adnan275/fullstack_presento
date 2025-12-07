@@ -82,7 +82,7 @@ export function CartProvider({ children }) {
     setItems((prev) => prev.filter((item) => !item.selected));
   };
 
-  const { cartCount, cartTotal, selectedItems } = useMemo(() => {
+  const { cartCount, cartTotal, deliveryCharge, finalTotal, selectedItems } = useMemo(() => {
 
     const normalizedItems = items.map(item => ({
       ...item,
@@ -93,7 +93,16 @@ export function CartProvider({ children }) {
     const count = selected.reduce((sum, item) => sum + item.quantity, 0);
     const total = selected.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
-    return { cartCount: count, cartTotal: total, selectedItems: selected };
+    const delivery = total > 499 ? 0 : 499;
+    const final = total + delivery;
+
+    return {
+      cartCount: count,
+      cartTotal: total,
+      deliveryCharge: delivery,
+      finalTotal: final,
+      selectedItems: selected
+    };
   }, [items]);
 
   const value = {
@@ -106,6 +115,8 @@ export function CartProvider({ children }) {
     removeSelectedItems,
     cartCount,
     cartTotal,
+    deliveryCharge,
+    finalTotal,
     selectedItems,
     toast,
     dismissToast: () => setToast(""),

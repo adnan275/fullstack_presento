@@ -110,6 +110,43 @@ router.get('/user', authenticateToken, async (req, res) => {
     }
 });
 
+router.get('/:id', authenticateToken, async (req, res) => {
+    try {
+        const reviewId = parseInt(req.params.id);
+        const userId = req.user.userId;
+
+        const review = await prisma.review.findUnique({
+            where: { id: reviewId },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        });
+
+        if (!review) {
+            return res.status(404).json({ error: 'Review not found' });
+        }
+
+        if (review.userId !== userId) {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
+
+        const reviewResponse = {
+            ...review,
+            photos: review.photos ? JSON.parse(review.photos) : []
+        };
+
+        res.json(reviewResponse);
+    } catch (error) {
+        console.error('Error fetching review:', error);
+        res.status(500).json({ error: 'Failed to fetch review' });
+    }
+});
+
 router.post('/', authenticateToken, reviewMediaUpload.fields([
     { name: 'photos', maxCount: 5 },
     { name: 'video', maxCount: 1 }

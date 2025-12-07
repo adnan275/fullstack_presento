@@ -63,13 +63,15 @@ export default function ProductDetails() {
       setCanReview(data.canReview);
       setHasReviewed(data.hasReviewed);
       if (data.hasReviewed && data.reviewId) {
-        const review = reviews.find(r => r.id === data.reviewId);
-        setExistingReview(review);
+        const review = await axios.get(`http://localhost:4000/api/reviews/${data.reviewId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setExistingReview(review.data);
       }
     } catch (err) {
       console.error("Error checking review eligibility:", err);
     }
-  }, [id, token, reviews]);
+  }, [id, token]);
 
   useEffect(() => {
     fetchProduct();
@@ -77,7 +79,7 @@ export default function ProductDetails() {
     if (token) {
       checkReviewEligibility();
     }
-  }, [fetchProduct, fetchReviews, checkReviewEligibility, token]);
+  }, [id, token]);
 
   const handleSubmitReview = async (formData) => {
     try {

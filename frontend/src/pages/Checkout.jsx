@@ -16,7 +16,7 @@ const emptyDetails = {
 };
 
 export default function Checkout() {
-  const { selectedItems, cartTotal, removeSelectedItems } = useCart();
+  const { selectedItems, cartTotal, deliveryCharge, finalTotal, removeSelectedItems } = useCart();
   const { createOrder } = useOrders();
   const [details, setDetails] = useState(emptyDetails);
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -263,12 +263,19 @@ export default function Checkout() {
               <span>₹{cartTotal.toFixed(2)}</span>
             </div>
             <div className="checkout-row">
-              <span>Shipping</span>
-              <span>Calculated at dispatch</span>
+              <span>Delivery Charge</span>
+              <span className={deliveryCharge === 0 ? "text-success" : ""}>
+                {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
+              </span>
             </div>
+            {deliveryCharge === 0 && cartTotal > 0 && (
+              <div className="checkout-note checkout-note--success">
+                <small>🎉 Free delivery on orders above ₹499!</small>
+              </div>
+            )}
             <div className="checkout-row checkout-row-total">
               <span>Grand Total</span>
-              <span>₹{cartTotal.toFixed(2)}</span>
+              <span>₹{finalTotal.toFixed(2)}</span>
             </div>
           </div>
         </section>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import ProductCardUser from "../components/ProductCardUser";
@@ -10,6 +10,7 @@ import { useProducts } from "../hooks/useProducts";
 import { useOrders } from "../hooks/useOrders";
 import { useCart } from "../context/CartContext.jsx";
 import "./products.css";
+import "../styles/Filters.css";
 
 export default function UserProducts({ defaultTab = "products" }) {
   const [products, setProducts] = useState([]);
@@ -23,6 +24,13 @@ export default function UserProducts({ defaultTab = "products" }) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewProduct, setReviewProduct] = useState(null);
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedTag, setSelectedTag] = useState("All Tags");
+  const [priceRange, setPriceRange] = useState([299, 49999]);
+  const [selectedRating, setSelectedRating] = useState("All");
+  const [selectedDiscount, setSelectedDiscount] = useState("All");
+  const [selectedAvailability, setSelectedAvailability] = useState("All");
 
   const contactLinks = [
     {
@@ -92,6 +100,47 @@ export default function UserProducts({ defaultTab = "products" }) {
     }
     loadData();
   }, [fetchAllProducts, fetchUserOrders, navigate, defaultTab]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      if (selectedCategory !== "All" && product.category !== selectedCategory) {
+        return false;
+      }
+
+      if (selectedTag !== "All Tags" && product.badge !== selectedTag) {
+        return false;
+      }
+
+      if (product.price < priceRange[0] || product.price > priceRange[1]) {
+        return false;
+      }
+
+      if (selectedRating !== "All") {
+        const minRating = parseInt(selectedRating);
+        const productRating = product.averageRating || 0;
+        if (productRating < minRating) {
+          return false;
+        }
+      }
+
+      if (selectedDiscount !== "All") {
+        const minDiscount = parseInt(selectedDiscount);
+        const productDiscount = product.discount || 0;
+        if (productDiscount < minDiscount) {
+          return false;
+        }
+      }
+
+      if (selectedAvailability === "In Stock" && product.stock === 0) {
+        return false;
+      }
+      if (selectedAvailability === "Out of Stock" && product.stock > 0) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [products, selectedCategory, selectedTag, priceRange, selectedRating, selectedDiscount, selectedAvailability]);
 
   const handlePlaceOrder = async (productId, quantity) => {
     setErrorMessage("");
@@ -245,37 +294,199 @@ export default function UserProducts({ defaultTab = "products" }) {
 
       <div className="page-title-section" style={{ padding: "0 2rem", marginBottom: "1rem" }}>
         {activeTab === "products" ? (
-          <h2>All Products ({products.length})</h2>
+          <h2>All Products ({filteredProducts.length})</h2>
         ) : (
           <h2>My Orders ({orders.length})</h2>
         )}
       </div>
 
       {activeTab === "products" && (
-        <div className="products-container">
-          {products.length === 0 ? (
-            <div className="no-products">
-              <div className="no-products-icon">🔍</div>
-              <h3>No products found</h3>
-              <p>Check back later for new products</p>
+        <>
+          <div className="filters-section">
+            <div className="filter-group">
+              <label>Category</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option>All</option>
+                <option>Personalized</option>
+                <option>Hampers</option>
+                <option>Gifts for Her</option>
+                <option>Gifts for Him</option>
+                <option>Kids Gifts</option>
+                <option>Couple Gifts</option>
+                <option>Romantic</option>
+                <option>Birthday</option>
+                <option>Anniversary</option>
+                <option>Home Decor</option>
+                <option>Festive Gifts</option>
+                <option>Luxury Gifts</option>
+                <option>Accessories</option>
+              </select>
             </div>
-          ) : (
-            <div className="products-grid">
-              {products.map((product) => (
-                <ProductCardUser
-                  key={product.id}
-                  product={product}
-                  onProductClick={(productId) => {
-                    setSelectedProductId(productId);
-                    setShowDetailsModal(true);
+
+            <div className="filter-group">
+              <label>Tags</label>
+              <select
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+              >
+                <option>All Tags</option>
+                <option>Best Seller</option>
+                <option>Trending</option>
+                <option>Popular</option>
+                <option>Limited Edition</option>
+                <option>New Arrival</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Price Range</label>
+              <div className="price-range-slider">
+                <div className="price-labels">
+                  <span>₹{priceRange[0]}</span>
+                  <span>₹{priceRange[1]}</span>
+                </div>
+                <input
+                  type="range"
+                  min="299"
+                  max="49999"
+                  value={priceRange[0]}
+                  onChange={(e) => {
+                    const newMin = parseInt(e.target.value);
+                    if (newMin < priceRange[1]) {
+                      setPriceRange([newMin, priceRange[1]]);
+                    }
                   }}
-                  onAddToCart={addToCart}
-                  onViewDetails={(productId) => navigate(`/products/${productId}`)}
+                  className="range-slider range-min"
                 />
-              ))}
+                <input
+                  type="range"
+                  min="299"
+                  max="49999"
+                  value={priceRange[1]}
+                  onChange={(e) => {
+                    const newMax = parseInt(e.target.value);
+                    if (newMax > priceRange[0]) {
+                      setPriceRange([priceRange[0], newMax]);
+                    }
+                  }}
+                  className="range-slider range-max"
+                />
+                <div className="price-inputs">
+                  <input
+                    type="number"
+                    value={priceRange[0]}
+                    onChange={(e) => {
+                      const newMin = parseInt(e.target.value) || 299;
+                      if (newMin < priceRange[1]) {
+                        setPriceRange([newMin, priceRange[1]]);
+                      }
+                    }}
+                    min="299"
+                    max={priceRange[1]}
+                    placeholder="Min"
+                  />
+                  <span>-</span>
+                  <input
+                    type="number"
+                    value={priceRange[1]}
+                    onChange={(e) => {
+                      const newMax = parseInt(e.target.value) || 49999;
+                      if (newMax > priceRange[0]) {
+                        setPriceRange([priceRange[0], newMax]);
+                      }
+                    }}
+                    min={priceRange[0]}
+                    max="49999"
+                    placeholder="Max"
+                  />
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+
+            <div className="filter-group">
+              <label>Rating</label>
+              <select
+                value={selectedRating}
+                onChange={(e) => setSelectedRating(e.target.value)}
+              >
+                <option>All</option>
+                <option value="4">4★ & above</option>
+                <option value="3">3★ & above</option>
+                <option value="2">2★ & above</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Discount</label>
+              <select
+                value={selectedDiscount}
+                onChange={(e) => setSelectedDiscount(e.target.value)}
+              >
+                <option>All</option>
+                <option value="10">10%+</option>
+                <option value="20">20%+</option>
+                <option value="30">30%+</option>
+                <option value="50">50%+</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Availability</label>
+              <select
+                value={selectedAvailability}
+                onChange={(e) => setSelectedAvailability(e.target.value)}
+              >
+                <option>All</option>
+                <option>In Stock</option>
+                <option>Out of Stock</option>
+              </select>
+            </div>
+
+            <div className="filter-actions">
+              <button
+                className="btn-reset-filters"
+                onClick={() => {
+                  setSelectedCategory("All");
+                  setSelectedTag("All Tags");
+                  setPriceRange([299, 49999]);
+                  setSelectedRating("All");
+                  setSelectedDiscount("All");
+                  setSelectedAvailability("All");
+                }}
+              >
+                Reset Filters
+              </button>
+            </div>
+          </div>
+
+          <div className="products-container">
+            {filteredProducts.length === 0 ? (
+              <div className="no-products">
+                <div className="no-products-icon">🔍</div>
+                <h3>No products found</h3>
+                <p>Try adjusting your filters</p>
+              </div>
+            ) : (
+              <div className="products-grid">
+                {filteredProducts.map((product) => (
+                  <ProductCardUser
+                    key={product.id}
+                    product={product}
+                    onProductClick={(productId) => {
+                      setSelectedProductId(productId);
+                      setShowDetailsModal(true);
+                    }}
+                    onAddToCart={addToCart}
+                    onViewDetails={(productId) => navigate(`/products/${productId}`)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {activeTab === "orders" && (

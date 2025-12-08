@@ -143,31 +143,43 @@ export default function OrderTrackingModal({ isOpen, onClose }) {
                 <div className="action-buttons">
                   <button
                     onClick={() => handleUpdateStatus("placed")}
-                    disabled={updatingStatus !== null}
+                    disabled={updatingStatus !== null || order.status === "cancelled"}
                     className="btn-action btn-placed"
                   >
                     ✓ Order Placed
                   </button>
                   <button
                     onClick={() => handleUpdateStatus("ready")}
-                    disabled={updatingStatus !== null}
+                    disabled={updatingStatus !== null || order.status === "cancelled"}
                     className="btn-action btn-ready"
                   >
                     ✓ Order Ready
                   </button>
                   <button
                     onClick={() => handleUpdateStatus("out_for_delivery")}
-                    disabled={updatingStatus !== null}
+                    disabled={updatingStatus !== null || order.status === "cancelled"}
                     className="btn-action btn-delivery"
                   >
                     ✓ Out for Delivery
                   </button>
                   <button
                     onClick={() => handleUpdateStatus("delivered")}
-                    disabled={updatingStatus !== null}
+                    disabled={updatingStatus !== null || order.status === "cancelled"}
                     className="btn-action btn-delivered"
                   >
                     ✓ Delivered
+                  </button>
+                  <button
+                    onClick={() => {
+                      const reason = prompt("Enter cancellation reason (optional):");
+                      if (reason !== null) {
+                        handleUpdateStatus("cancelled");
+                      }
+                    }}
+                    disabled={updatingStatus !== null || order.status === "cancelled" || order.status === "delivered"}
+                    className="btn-action btn-cancel"
+                  >
+                    ❌ Cancel Order
                   </button>
                 </div>
               </div>

@@ -220,6 +220,35 @@ router.put("/:orderId", auth, async (req, res) => {
       return res.status(400).json({ error: "Invalid status" });
     }
 
+    const existingOrder = await prisma.order.findUnique({
+      where: { id: parseInt(orderId) },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    if (status === "cancelled" && existingOrder.status !== "cancelled") {
+      for (const item of existingOrder.items) {
+        await prisma.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: {
+              increment: item.quantity,
+            },
+          },
+        });
+        console.log(`✅ Stock restored for product ${item.product.name}: +${item.quantity} (Order #${orderId} cancelled)`);
+      }
+    }
+
     const order = await prisma.order.update({
       where: { id: parseInt(orderId) },
       data: {
@@ -249,6 +278,18 @@ router.put("/:orderId", auth, async (req, res) => {
         },
       },
     });
+
+    if (status === "out_for_delivery") {
+      const { sendOutForDeliveryEmail } = await import("../utils/sendEmail.js");
+      sendOutForDeliveryEmail(order).catch((emailErr) =>
+        console.error("Out for delivery email error:", emailErr)
+      );
+    } else if (status === "cancelled") {
+      const { sendOrderCancellationEmail } = await import("../utils/sendEmail.js");
+      sendOrderCancellationEmail(order, message).catch((emailErr) =>
+        console.error("Cancellation email error:", emailErr)
+      );
+    }
 
     res.json(order);
   } catch (err) {

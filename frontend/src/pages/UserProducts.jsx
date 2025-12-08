@@ -227,6 +227,8 @@ export default function UserProducts({ defaultTab = "products" }) {
         return "#2e7d32";
       case "pending":
         return "#f57c00";
+      case "cancelled":
+        return "#dc2626";
       default:
         return "#999";
     }
@@ -512,14 +514,27 @@ export default function UserProducts({ defaultTab = "products" }) {
                         })}
                       </p>
                     </div>
-                    <div
-                      className="order-status"
-                      style={{
-                        backgroundColor: getStatusColor(order.status),
-                        color: "white",
-                      }}
-                    >
-                      {order.status.toUpperCase().replace(/_/g, " ")}
+                    <div>
+                      <div
+                        className="order-status"
+                        style={{
+                          backgroundColor: getStatusColor(order.status),
+                          color: "white",
+                        }}
+                      >
+                        {order.status.toUpperCase().replace(/_/g, " ")}
+                      </div>
+                      {!["delivered", "cancelled"].includes(order.status) && (
+                        <p style={{
+                          fontSize: "13px",
+                          color: "#f97316",
+                          fontWeight: "600",
+                          marginTop: "8px",
+                          textAlign: "center"
+                        }}>
+                          ⏱️ Estimated Delivery: 5-8 days
+                        </p>
+                      )}
                     </div>
                   </div>
 

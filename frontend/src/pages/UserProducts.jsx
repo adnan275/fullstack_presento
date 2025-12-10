@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import ProductCardUser from "../components/ProductCardUser";
 import ProductModal from "../components/ProductModal";
 import OrderConfirmation from "../components/OrderConfirmation";
@@ -202,8 +202,8 @@ export default function UserProducts({ defaultTab = "products" }) {
   const handleSubmitReview = useCallback(async (reviewData) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        'http://localhost:4000/api/reviews',
+      await api.post(
+        '/reviews',
         reviewData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
 import api from "../utils/api";
 import { useCart } from "../context/CartContext.jsx";
 import StarRating from "../components/StarRating";
@@ -56,7 +55,7 @@ export default function ProductDetails() {
 
   const fetchReviews = useCallback(async () => {
     try {
-      const { data } = await axios.get(`http://localhost:4000/api/reviews/product/${id}`);
+      const { data } = await api.get(`/reviews/product/${id}`);
       setReviews(data.reviews);
       setAverageRating(data.averageRating);
       setTotalReviews(data.totalReviews);
@@ -67,13 +66,13 @@ export default function ProductDetails() {
 
   const checkReviewEligibility = useCallback(async () => {
     try {
-      const { data } = await axios.get(`http://localhost:4000/api/reviews/can-review/${id}`, {
+      const { data } = await api.get(`/reviews/can-review/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCanReview(data.canReview);
       setHasReviewed(data.hasReviewed);
       if (data.hasReviewed && data.reviewId) {
-        const review = await axios.get(`http://localhost:4000/api/reviews/${data.reviewId}`, {
+        const review = await api.get(`/reviews/${data.reviewId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setExistingReview(review.data);
@@ -94,8 +93,8 @@ export default function ProductDetails() {
   const handleSubmitReview = async (formData) => {
     try {
       if (existingReview) {
-        await axios.put(
-          `http://localhost:4000/api/reviews/${existingReview.id}`,
+        await api.put(
+          `/reviews/${existingReview.id}`,
           formData,
           {
             headers: {
@@ -105,8 +104,8 @@ export default function ProductDetails() {
           }
         );
       } else {
-        await axios.post(
-          'http://localhost:4000/api/reviews',
+        await api.post(
+          '/reviews',
           formData,
           {
             headers: {
@@ -139,7 +138,7 @@ export default function ProductDetails() {
     if (!window.confirm('Are you sure you want to delete this review?')) return;
 
     try {
-      await axios.delete(`http://localhost:4000/api/reviews/${reviewId}`, {
+      await api.delete(`/reviews/${reviewId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchReviews();

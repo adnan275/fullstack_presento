@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import "../styles/Profile.css";
 
 export default function Profile() {
@@ -40,7 +40,7 @@ export default function Profile() {
 
   const fetchAddresses = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/addresses", {
+      const res = await api.get("/addresses", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAddresses(res.data);
@@ -82,13 +82,13 @@ export default function Profile() {
 
     try {
       if (editingAddress) {
-        await axios.put(
-          `http://localhost:4000/api/addresses/${editingAddress.id}`,
+        await api.put(
+          `/addresses/${editingAddress.id}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        await axios.post("http://localhost:4000/api/addresses", formData, {
+        await api.post("/addresses", formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -127,7 +127,7 @@ export default function Profile() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
     try {
-      await axios.delete(`http://localhost:4000/api/addresses/${id}`, {
+      await api.delete(`/addresses/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchAddresses();

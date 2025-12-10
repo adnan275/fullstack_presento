@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 import { useOrders } from "../hooks/useOrders.js";
-import axios from "axios";
+import api from "../utils/api";
 import "../styles/Checkout.css";
 
 const emptyDetails = {
@@ -51,8 +51,8 @@ export default function Checkout() {
 
   useEffect(() => {
     if (userId && token) {
-      axios
-        .get("http://localhost:4000/api/addresses", {
+      api
+        .get("/addresses", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
@@ -178,8 +178,8 @@ export default function Checkout() {
     try {
 
       if (selectedAddressId === "new") {
-        await axios.post(
-          "http://localhost:4000/api/addresses",
+        await api.post(
+          "/addresses",
           details,
           { headers: { Authorization: `Bearer ${token}` } }
         );

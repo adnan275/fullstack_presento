@@ -171,6 +171,216 @@
   contain: layout;
 }
 
+/* Contact Section Styles */
+.contact-section {
+  width: 100%;
+  margin-top: 6rem;
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, #fff 0%, var(--gray-50) 100%);
+  border-top: 1px solid var(--gray-100);
+}
+
+.contact-wrapper {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-header {
+  margin-bottom: 3.5rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-pill {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: white;
+  color: var(--primary-pink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 50px;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  box-shadow: var(--shadow-sm);
+}
+
+.contact-header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.contact-header p {
+  color: var(--gray-500);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Base grid layout - desktop first */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 0.5rem;
+  max-width: 100%;
+}
+
+.contact-item {
+  background: white;
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--gray-100);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.contact-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(236, 72, 153, 0.12);
+  border-color: rgba(236, 72, 153, 0.3);
+  z-index: 5;
+}
+
+/* Reduced size for elegance - strict enforcement */
+.contact-icon {
+  width: 56px !important;
+  height: 56px !important;
+  background: var(--gray-50);
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--primary-pink);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* Enforce SVG size strictly to prevent "huge icon" bug */
+.contact-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+  fill: currentColor;
+  display: block;
+}
+
+.contact-item:hover .contact-icon {
+  transform: scale(1.05) rotate(5deg);
+  background: var(--gradient-primary);
+  color: white;
+  box-shadow: 0 8px 16px rgba(236, 72, 153, 0.25);
+}
+
+.contact-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+}
+
+.contact-label {
+  display: block;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
+.contact-value {
+  display: block;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding: 0 0.5rem;
+}
+
+.contact-item:hover .contact-value {
+  color: var(--primary-pink);
+}
+
+.contact-item:hover .contact-action {
+  opacity: 1;
+  transform: translateY(0);
+  background: var(--primary-pink);
+  color: white;
+}
+
+.contact-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+}
+
+.contact-label {
+  display: block;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+
+.contact-value {
+  display: block;
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding: 0 0.5rem;
+}
+
+.contact-item:hover .contact-value {
+  color: var(--primary-pink);
+}
+
+.contact-action {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 28px;
+  height: 28px;
+  background: var(--gray-50);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.contact-item:hover .contact-action {
+  opacity: 1;
+  transform: translateY(0);
+  background: var(--primary-pink);
+  color: white;
+}
+
 @media (max-width: 1024px) {
   .contact-wrapper {
     grid-template-columns: 1fr;

@@ -139,6 +139,7 @@
   max-width: var(--container-width);
   margin: 0 auto;
   padding: 0 2rem;
+  margin-top: 1rem;
 }
 
 .admin-footer {

@@ -9,6 +9,8 @@ import { renderIcon } from "../components/IconComponents";
 import { useProducts } from "../hooks/useProducts";
 import { useOrders } from "../hooks/useOrders";
 import { useCart } from "../context/CartContext.jsx";
+import SearchBar from "../components/SearchBar";
+import { searchProducts, saveSearchToHistory } from "../utils/searchUtils";
 import "./products.css";
 import "../styles/Filters.css";
 
@@ -31,6 +33,8 @@ export default function UserProducts({ defaultTab = "products" }) {
   const [selectedRating, setSelectedRating] = useState("All");
   const [selectedDiscount, setSelectedDiscount] = useState("All");
   const [selectedAvailability, setSelectedAvailability] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const contactLinks = [
     {
@@ -102,7 +106,9 @@ export default function UserProducts({ defaultTab = "products" }) {
   }, [fetchAllProducts, fetchUserOrders, navigate, defaultTab]);
 
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    const baseProducts = searchQuery ? searchResults : products;
+
+    return baseProducts.filter(product => {
       if (selectedCategory !== "All" && product.category !== selectedCategory) {
         return false;
       }
@@ -140,7 +146,21 @@ export default function UserProducts({ defaultTab = "products" }) {
 
       return true;
     });
-  }, [products, selectedCategory, selectedTag, priceRange, selectedRating, selectedDiscount, selectedAvailability]);
+  }, [products, searchQuery, searchResults, selectedCategory, selectedTag, priceRange, selectedRating, selectedDiscount, selectedAvailability]);
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    const results = searchProducts(query, products);
+    setSearchResults(results);
+    if (query && results.length > 0) {
+      saveSearchToHistory(query, results);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+  };
 
   const handlePlaceOrder = async (productId, quantity) => {
     setErrorMessage("");
@@ -304,6 +324,12 @@ export default function UserProducts({ defaultTab = "products" }) {
 
       {activeTab === "products" && (
         <>
+          <SearchBar
+            products={products}
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+          />
+
           <div className="filters-section">
             <div className="filter-group">
               <label>Category</label>
@@ -463,6 +489,7 @@ export default function UserProducts({ defaultTab = "products" }) {
               </button>
             </div>
           </div>
+
 
           <div className="products-container">
             {filteredProducts.length === 0 ? (

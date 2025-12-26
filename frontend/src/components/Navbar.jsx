@@ -73,48 +73,50 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="pt-navbar">
-      <div className="pt-navbar__ambient-decorations">
-        <span className="pt-navbar__ambient-heart" style={{ left: '15%', animationDelay: '0s' }}>♥</span>
-        <span className="pt-navbar__ambient-heart" style={{ left: '50%', animationDelay: '3s' }}>✨</span>
-        <span className="pt-navbar__ambient-heart" style={{ left: '85%', animationDelay: '6s' }}>♥</span>
-      </div>
+    <>
+      <nav className="pt-navbar">
+        <div className="pt-navbar__ambient-decorations">
+          <span className="pt-navbar__ambient-heart" style={{ left: '15%', animationDelay: '0s' }}>♥</span>
+          <span className="pt-navbar__ambient-heart" style={{ left: '50%', animationDelay: '3s' }}>✨</span>
+          <span className="pt-navbar__ambient-heart" style={{ left: '85%', animationDelay: '6s' }}>♥</span>
+        </div>
 
-      <div className="pt-navbar__brand" onClick={() => navigate("/")}>
-        Presento Treasure
-      </div>
+        <div className="pt-navbar__brand" onClick={() => navigate("/")}>
+          Presento Treasure
+        </div>
 
-      <div className="pt-navbar__links">
-        {navLinks.map((link) => (
-          <NavLinkWithAnimation
-            key={link.to}
-            to={link.to}
-            end={link.to === "/"}
-          >
-            {link.label}
+        <div className="pt-navbar__links">
+          {navLinks.map((link) => (
+            <NavLinkWithAnimation
+              key={link.to}
+              to={link.to}
+              end={link.to === "/"}
+            >
+              {link.label}
+            </NavLinkWithAnimation>
+          ))}
+
+          <NavLinkWithAnimation to="/profile" end>
+            Profile (User Page)
           </NavLinkWithAnimation>
-        ))}
 
-        <NavLinkWithAnimation to="/profile" end>
-          Profile (User Page)
-        </NavLinkWithAnimation>
-
-        <button className="pt-navbar__cart" onClick={() => navigate("/cart")}>
-          Cart
-          {cartCount > 0 && <span className="pt-navbar__badge">{cartCount}</span>}
-        </button>
-        {localStorage.getItem("token") && (
-          <button className="pt-navbar__logout" onClick={handleLogout}>
-            Logout
+          <button className="pt-navbar__cart" onClick={() => navigate("/cart")}>
+            Cart
+            {cartCount > 0 && <span className="pt-navbar__badge">{cartCount}</span>}
           </button>
-        )}
-      </div>
+          {localStorage.getItem("token") && (
+            <button className="pt-navbar__logout" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
+        </div>
 
-      <button className="pt-navbar__toggle" onClick={toggleMobileMenu} aria-label="Toggle menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+        <button className="pt-navbar__toggle" onClick={toggleMobileMenu} aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
 
       <div
         className={`pt-navbar__mobile-overlay ${mobileMenuOpen ? 'active' : ''}`}
@@ -158,6 +160,6 @@ export default function Navbar() {
           )}
         </div>
       </div>
-    </nav>
+    </>
   );
 }

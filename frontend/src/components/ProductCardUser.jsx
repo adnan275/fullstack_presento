@@ -60,6 +60,16 @@ function ProductCardUser({
           }}
           transition={{ duration: 0.4 }}
         />
+        {product.badge && (
+          <motion.div
+            className="product-tag-badge"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            {product.badge}
+          </motion.div>
+        )}
         <motion.div
           className={`product-badge ${product.stock > 0 ? "in-stock" : "out-of-stock"}`}
           initial={{ opacity: 0, scale: 0.8 }}

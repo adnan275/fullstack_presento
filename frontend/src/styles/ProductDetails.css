@@ -72,6 +72,32 @@
     align-self: flex-start;
 }
 
+.product-details-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.95);
+    color: #ec4899;
+    border: 1.5px solid rgba(236, 72, 153, 0.3);
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    margin-left: 0.5rem;
+    align-self: flex-start;
+    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.15);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+}
+
+.product-details-badge:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(236, 72, 153, 0.5);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.25);
+    transform: translateY(-1px);
+}
+
 .product-details-info h1 {
     font-size: 2.5rem;
     margin-bottom: 1rem;

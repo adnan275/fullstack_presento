@@ -231,6 +231,16 @@ export default function ProductDetails() {
           >
             {product.category}
           </motion.p>
+          {product.badge && (
+            <motion.p
+              className="product-details-badge"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.25 }}
+            >
+              {product.badge}
+            </motion.p>
+          )}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

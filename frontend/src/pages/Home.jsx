@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import api from "../utils/api";
 import FAQ from "../components/FAQ";
 import {
@@ -29,6 +29,8 @@ export default function Home() {
   const navigate = useNavigate();
   const [trendingProducts, setTrendingProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
 
   const offerings = [
     { title: "Personalized Nikah Nama", icon: "✨" },
@@ -44,11 +46,31 @@ export default function Home() {
   ];
 
   useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setItemsPerPage(1);
+      } else if (window.innerWidth < 1024) {
+        setItemsPerPage(2);
+      } else {
+        setItemsPerPage(4);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     async function fetchFeaturedProducts() {
       try {
         const { data } = await api.get("/products");
-        const featured = data.products ? data.products.filter(p => p.isFeatured) : data.filter(p => p.isFeatured);
-        setTrendingProducts(featured.length > 0 ? featured : (data.products || data).slice(0, 5));
+        const featured = data.products
+          ? data.products.filter((p) => p.isFeatured)
+          : data.filter((p) => p.isFeatured);
+        setTrendingProducts(
+          featured.length > 0 ? featured.slice(0, 12) : (data.products || data).slice(0, 12)
+        );
       } catch (err) {
         console.error("Error fetching featured products:", err);
       } finally {
@@ -57,6 +79,19 @@ export default function Home() {
     }
     fetchFeaturedProducts();
   }, []);
+
+  useEffect(() => {
+    if (trendingProducts.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = prevIndex + itemsPerPage;
+        return nextIndex >= trendingProducts.length ? 0 : nextIndex;
+      });
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [trendingProducts, itemsPerPage]);
 
   const handleProductClick = (productId) => {
     navigate(`/products/${productId}`);
@@ -163,64 +198,68 @@ export default function Home() {
             <div className="trending-loading">Loading products...</div>
           ) : (
             <>
-              <motion.div
-                className="trending-grid"
-                variants={staggerContainer}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true, margin: "-50px" }}
-              >
-                {trendingProducts.map((product, index) => {
-                  const badgeClass = getBadgeClass(product.badge);
-                  return (
-                    <motion.div
-                      key={product.id}
-                      className="trending-card"
-                      variants={staggerItem}
-                      whileHover={{
-                        y: -8,
-                        scale: 1.02,
-                        transition: { duration: 0.3 }
-                      }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleProductClick(product.id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <motion.div
-                        className="trending-image-wrapper"
-                        whileHover="hover"
-                        initial="rest"
-                      >
-                        <motion.img
-                          src={product.imageUrl}
-                          alt={product.name}
-                          loading="lazy"
-                          variants={{
-                            rest: { scale: 1 },
-                            hover: { scale: 1.1 }
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentIndex}
+                  className="trending-grid"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                >
+                  {trendingProducts
+                    .slice(currentIndex, currentIndex + itemsPerPage)
+                    .map((product, index) => {
+                      const badgeClass = getBadgeClass(product.badge);
+                      return (
+                        <motion.div
+                          key={product.id}
+                          className="trending-card"
+                          whileHover={{
+                            y: -8,
+                            scale: 1.02,
+                            transition: { duration: 0.3 }
                           }}
-                          transition={{ duration: 0.4 }}
-                        />
-                        {product.badge && (
-                          <motion.span
-                            className={`trending-badge ${badgeClass}`}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.1 + 0.3 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleProductClick(product.id)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <motion.div
+                            className="trending-image-wrapper"
+                            whileHover="hover"
+                            initial="rest"
                           >
-                            {product.badge}
-                          </motion.span>
-                        )}
-                      </motion.div>
-                      <div className="trending-info">
-                        <h3>{product.name}</h3>
-                        <p className="trending-price">₹{product.price}</p>
-                        <p className="trending-category">{product.category}</p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
+                            <motion.img
+                              src={product.imageUrl}
+                              alt={product.name}
+                              loading="lazy"
+                              variants={{
+                                rest: { scale: 1 },
+                                hover: { scale: 1.1 }
+                              }}
+                              transition={{ duration: 0.4 }}
+                            />
+                            {product.badge && (
+                              <motion.span
+                                className={`trending-badge ${badgeClass}`}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 + 0.3 }}
+                              >
+                                {product.badge}
+                              </motion.span>
+                            )}
+                          </motion.div>
+                          <div className="trending-info">
+                            <h3>{product.name}</h3>
+                            <p className="trending-price">₹{product.price}</p>
+                            <p className="trending-category">{product.category}</p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </motion.div>
+              </AnimatePresence>
 
               <motion.div
                 className="trending-view-all"

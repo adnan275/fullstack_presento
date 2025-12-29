@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debounce, getSuggestions, getSearchHistory, clearSearchHistory } from '../utils/searchUtils';
 import './SearchBar.css';
@@ -11,6 +12,7 @@ const SearchBar = ({ products, onSearch, onClear }) => {
     const [activeTab, setActiveTab] = useState('suggestions');
     const searchRef = useRef(null);
     const inputRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         setSearchHistory(getSearchHistory());
@@ -61,14 +63,15 @@ const SearchBar = ({ products, onSearch, onClear }) => {
     };
 
     const handleSuggestionClick = (suggestion) => {
-        if (suggestion.type === 'product') {
-            setQuery(suggestion.text);
-            onSearch(suggestion.text);
+        if (suggestion.type === 'product' && suggestion.product) {
+            navigate(`/products/${suggestion.product.id}`);
+            setShowDropdown(false);
+            setQuery('');
         } else if (suggestion.type === 'category' || suggestion.type === 'badge') {
             setQuery(suggestion.text);
             onSearch(suggestion.text);
+            setShowDropdown(false);
         }
-        setShowDropdown(false);
     };
 
     const handleHistoryClick = (historyItem) => {

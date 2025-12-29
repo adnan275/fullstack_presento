@@ -508,32 +508,25 @@
     }
 }
 
-/* Critical Mobile Fixes for Real Devices */
 @media (max-width: 768px) {
-
-    /* Ensure navbar is always on top and clickable */
     .pt-navbar {
         z-index: 9999 !important;
         position: sticky !important;
     }
 
-    /* Make sure hamburger is always clickable */
     .pt-navbar__toggle {
         z-index: 10000 !important;
         position: relative !important;
     }
 
-    /* Ensure mobile menu overlay is clickable */
     .pt-navbar__mobile-overlay {
         z-index: 9998 !important;
     }
 
-    /* Ensure mobile menu is on top */
     .pt-navbar__mobile-menu {
         z-index: 9999 !important;
     }
 
-    /* Make all navbar links explicitly clickable */
     .pt-navbar__link,
     .pt-navbar__cart,
     .pt-navbar__logout,

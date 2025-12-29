@@ -142,7 +142,6 @@
     }
 }
 
-/* Ensure FAQ is clickable on mobile */
 @media (max-width: 768px) {
     .faq-question {
         touch-action: manipulation;

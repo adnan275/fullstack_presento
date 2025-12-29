@@ -374,10 +374,8 @@ textarea:focus {
   }
 }
 
-/* Critical Mobile Fixes for Real Devices */
 @media (max-width: 768px) {
 
-  /* Ensure all interactive elements are clickable */
   button,
   a,
   [role="button"],
@@ -387,8 +385,6 @@ textarea:focus {
     cursor: pointer !important;
   }
 
-  /* Only prevent pointer events on specific decorative overlays - NOT all pseudo-elements */
-  /* This targets only the gradient backgrounds and shimmer effects that should not be clickable */
   .home-hero::before,
   .home-hero::after,
   .hero-card::before,
@@ -398,18 +394,15 @@ textarea:focus {
     pointer-events: none !important;
   }
 
-  /* Ensure proper z-index stacking */
   nav {
     z-index: 1000 !important;
   }
 
-  /* Remove any potential blocking layers */
   .home-page {
     position: relative;
     z-index: 1;
   }
 
-  /* Ensure buttons are always on top */
   .btn,
   .btn-primary,
   .btn-secondary,

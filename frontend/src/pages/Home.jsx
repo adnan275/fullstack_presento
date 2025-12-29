@@ -105,6 +105,7 @@ export default function Home() {
       initial="initial"
       animate="animate"
       exit="exit"
+      style={{ position: 'relative', zIndex: 1 }}
     >
       <section className="home-hero">
         <motion.div

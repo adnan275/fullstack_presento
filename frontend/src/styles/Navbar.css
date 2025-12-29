@@ -95,6 +95,7 @@
     position: relative;
     display: inline-block;
     will-change: transform;
+    touch-action: manipulation;
 }
 
 .pt-navbar__link:hover {
@@ -188,6 +189,7 @@
     gap: 0.5rem;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
+    touch-action: manipulation;
 }
 
 .pt-navbar__cart:hover {
@@ -216,6 +218,7 @@
     padding: 0.5rem;
     transition: all 0.25s ease;
     will-change: transform;
+    touch-action: manipulation;
 }
 
 .pt-navbar__logout:hover {
@@ -239,6 +242,8 @@
     gap: 4px;
     position: relative;
     z-index: 1;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(236, 72, 153, 0.2);
 }
 
 .pt-navbar__toggle span {
@@ -270,10 +275,12 @@
     z-index: 1001;
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .pt-navbar__mobile-overlay.active {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .pt-navbar__mobile-menu {
@@ -498,5 +505,40 @@
     .pt-navbar__mobile-menu {
         width: 100%;
         max-width: 100%;
+    }
+}
+
+/* Critical Mobile Fixes for Real Devices */
+@media (max-width: 768px) {
+
+    /* Ensure navbar is always on top and clickable */
+    .pt-navbar {
+        z-index: 9999 !important;
+        position: sticky !important;
+    }
+
+    /* Make sure hamburger is always clickable */
+    .pt-navbar__toggle {
+        z-index: 10000 !important;
+        position: relative !important;
+    }
+
+    /* Ensure mobile menu overlay is clickable */
+    .pt-navbar__mobile-overlay {
+        z-index: 9998 !important;
+    }
+
+    /* Ensure mobile menu is on top */
+    .pt-navbar__mobile-menu {
+        z-index: 9999 !important;
+    }
+
+    /* Make all navbar links explicitly clickable */
+    .pt-navbar__link,
+    .pt-navbar__cart,
+    .pt-navbar__logout,
+    .pt-navbar__brand {
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
     }
 }

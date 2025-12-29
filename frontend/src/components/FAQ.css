@@ -141,3 +141,16 @@
         font-size: 0.9rem;
     }
 }
+
+/* Ensure FAQ is clickable on mobile */
+@media (max-width: 768px) {
+    .faq-question {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(236, 72, 153, 0.1);
+        pointer-events: auto !important;
+    }
+
+    .faq-item {
+        pointer-events: auto !important;
+    }
+}

@@ -82,6 +82,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: rgba(236, 72, 153, 0.2);
+  touch-action: manipulation;
 }
 
 h1,
@@ -143,6 +145,8 @@ a {
   outline: none;
   font-size: 1rem;
   letter-spacing: 0.025em;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(236, 72, 153, 0.3);
 }
 
 .btn-primary {
@@ -367,5 +371,51 @@ textarea:focus {
   textarea {
     padding: 0.65rem 0.75rem;
     font-size: 0.9rem;
+  }
+}
+
+/* Critical Mobile Fixes for Real Devices */
+@media (max-width: 768px) {
+
+  /* Ensure all interactive elements are clickable */
+  button,
+  a,
+  [role="button"],
+  [onclick] {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: rgba(236, 72, 153, 0.2) !important;
+    cursor: pointer !important;
+  }
+
+  /* Only prevent pointer events on specific decorative overlays - NOT all pseudo-elements */
+  /* This targets only the gradient backgrounds and shimmer effects that should not be clickable */
+  .home-hero::before,
+  .home-hero::after,
+  .hero-card::before,
+  .home-card--cta::before,
+  .home-card--cta::after,
+  .btn-primary::after {
+    pointer-events: none !important;
+  }
+
+  /* Ensure proper z-index stacking */
+  nav {
+    z-index: 1000 !important;
+  }
+
+  /* Remove any potential blocking layers */
+  .home-page {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure buttons are always on top */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-instagram {
+    position: relative;
+    z-index: 10 !important;
   }
 }

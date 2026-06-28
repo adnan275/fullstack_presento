@@ -1,4 +1,4 @@
-# 🌸 Presento — Premium Full-Stack E-Commerce Platform
+# 🌸 Presento Treasure — Premium Full-Stack E-Commerce Platform
 
 Presento is a state-of-the-art, fully featured full-stack e-commerce marketplace designed with premium aesthetics. It incorporates **glassmorphism design concepts**, smooth **micro-animations (Framer Motion)**, and a highly polished dark-pink color palette (Playfair Display & Inter typography). 
 
